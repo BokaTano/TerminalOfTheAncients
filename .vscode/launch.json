@@ -1,0 +1,22 @@
+{
+    "configurations": [
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:TerminalOfTheAncients}",
+            "name": "Debug terminal-of-the-ancients",
+            "program": "${workspaceFolder:TerminalOfTheAncients}/.build/debug/terminal-of-the-ancients",
+            "preLaunchTask": "swift: Build Debug terminal-of-the-ancients"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:TerminalOfTheAncients}",
+            "name": "Release terminal-of-the-ancients",
+            "program": "${workspaceFolder:TerminalOfTheAncients}/.build/release/terminal-of-the-ancients",
+            "preLaunchTask": "swift: Build Release terminal-of-the-ancients"
+        }
+    ]
+}
