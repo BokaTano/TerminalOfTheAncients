@@ -1,5 +1,6 @@
 import Foundation
 import SwiftData
+import ShellOut
 
 @Model
 final class PlayerProgress {
@@ -81,6 +82,17 @@ struct Puzzle {
             ),
             Puzzle(
                 id: 5,
+                title: "The Shell Script Ritual",
+                description: "The ancient terminal displays a message:\n> \"The ancients automated their workflows with shell scripts.\n> Execute the sacred build script to prove your mastery.\"\n\nYou must run the build_and_run.sh script and provide the word 'automation' to prove you understand shell scripting.",
+                hint: "Run the build script and then type 'automation' as your answer.",
+                solution: "automation",
+                validator: { input in
+                    // This will be handled by the ShellOut puzzle logic
+                    ShellOutPuzzle.validateShellScriptExecution(input: input)
+                }
+            ),
+            Puzzle(
+                id: 6,
                 title: "The Vault Gate",
                 description: "The terminal displays corrupted data: 'T3rm1n4l_0f_th3_4nc13nts'. You must recover the correct content by replacing numbers with letters (3→e, 4→a, 1→l, 0→o).",
                 hint: "Look at the pattern: numbers are being used as letters. 3=e, 4=a, 1=l, 0=o",
@@ -88,5 +100,21 @@ struct Puzzle {
                 validator: { input in input.lowercased() == "terminal_of_the_ancients" }
             )
         ]
+    }
+}
+
+// Helper class for ShellOut puzzle
+class ShellOutPuzzle {
+    static func validateShellScriptExecution(input: String) -> Bool {
+        do {
+            // First, try to run the build script to ensure it exists and works
+            _ = try shellOut(to: "chmod +x build_and_run.sh && ./build_and_run.sh --status")
+            
+            // Check if the input is the expected answer
+            return input.lowercased() == "automation"
+        } catch {
+            print("❌ Shell script execution failed: \(error)")
+            return false
+        }
     }
 } 

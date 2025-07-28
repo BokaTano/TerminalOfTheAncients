@@ -79,8 +79,8 @@ class GameEngine {
                     
                     try? modelContext.save()
                     
-                    // Check if we're moving to task 5 (JSON Codex) and show trapdoor scene
-                    if progress.currentTaskIndex == 5 { // After completing task 4 (JSON Codex)
+                    // Check if we're moving to task 6 (Shell Script Ritual) and show trapdoor scene
+                    if progress.currentTaskIndex == 6 { // After completing task 5 (Shell Script Ritual)
                         print("\n🚪 As you step forward, the floor beneath you suddenly gives way...")
                         await ASCIIArt.showTrapdoorScene()
                         print("\n🎮 Continue your journey in the hidden chamber below...")

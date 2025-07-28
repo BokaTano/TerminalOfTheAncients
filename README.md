@@ -1,145 +1,136 @@
-# Terminal of the Ancients
+# 🏛️ Terminal of the Ancients
 
-An interactive CLI adventure game where you play as a digital archaeologist discovering an ancient Swift terminal on the island of Texel.
+An interactive CLI adventure game written in Swift, where you play as a digital archaeologist discovering ancient Swift code puzzles.
 
-## 🎮 Story
+## 🎮 About
 
 You are a digital archaeologist on the island of Texel. Hidden beneath the dunes, you discover an ancient CLI terminal — a remnant of a lost civilization of Swift developers. To unlock the secrets of their knowledge, you must complete puzzles encoded in Swift code.
 
-Each puzzle grants you access to the next part of the story. Your progress is saved locally using SwiftData so you can return later and continue where you left off.
+Each puzzle grants you access to the next part of the story. Your progress is saved locally so you can return later and continue where you left off.
 
-## 🚀 Features
+## 🚀 Getting Started
 
-- **Interactive CLI Adventure**: Solve puzzles through command-line interaction
-- **Progress Persistence**: Your progress is automatically saved using SwiftData
-- **Multiple Challenges**: 5 unique puzzles testing different Swift concepts
-- **ASCII Art**: Beautiful terminal-based UI with banners and emojis
-- **Hints System**: Get help when stuck on puzzles
-- **Easter Eggs**: Discover hidden secrets throughout the game
+### Prerequisites
 
-## 📋 Requirements
+- Swift 6.2 or later
+- macOS (for CLI development)
 
-- macOS 14.0+ (Sonoma or later)
-- Swift 6.2+
+### Installation
 
-## 🛠️ Installation
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd TerminalOfTheAncients
+```
 
-1. Clone or navigate to the project directory
 2. Build the project:
-   ```bash
-   swift build
-   ```
-3. Run the executable:
-   ```bash
-   .build/debug/terminal-of-the-ancients
-   ```
+```bash
+swift build
+```
+
+3. Run the game:
+```bash
+.build/debug/terminal-of-the-ancients
+```
 
 ## 🎯 How to Play
 
 ### Starting the Game
 
-```bash
-# Start a new game
-./terminal-of-the-ancients --initiate
+- **New Game**: Run `./build/debug/terminal-of-the-ancients`
+- **Reset Progress**: Use `--reset` flag
+- **Check Status**: Use `--status` flag
+- **Skip First Puzzle**: Use `--initiate` flag (for testing)
 
-# Check your progress
-./terminal-of-the-ancients --status
+### Game Controls
 
-# Reset the game (start over)
-./terminal-of-the-ancients --reset
-```
-
-### Game Commands
-
-During gameplay, you can use these commands:
-- `hint` - Get a hint for the current puzzle
-- `quit` or `exit` - Save and exit the game
-- `xyzzy` - Discover an easter egg
+- **Answer Puzzles**: Type your answer when prompted
+- **Get Hints**: Type `hint` during a puzzle
+- **Quit Game**: Type `quit` or `exit`
+- **Easter Egg**: Type `xyzzy` for a surprise
 
 ## 🧩 Puzzles
 
-### 1. Welcome Ritual
-**Concept**: CLI Argument Parsing  
-**Challenge**: Launch the program with the correct flag to begin your journey.
+The game features 7 unique puzzles that teach Swift programming concepts:
 
-### 2. The Echo Chamber
-**Concept**: `readLine()` and Input/Output  
-**Challenge**: Echo back exactly what the terminal says to you.
+1. **The Sigil Compiler** - Modify source code and rebuild
+2. **Welcome Ritual** - Learn CLI argument parsing
+3. **The Echo Chamber** - Basic input/output
+4. **The File of Truth** - File reading operations
+5. **The JSON Codex** - JSON parsing and decoding
+6. **The Shell Script Ritual** - Execute shell scripts with ShellOut
+7. **The Vault Gate** - String manipulation and pattern recognition
 
-### 3. The File of Truth
-**Concept**: File Reading  
-**Challenge**: Read a text file and extract the secret code hidden within.
+## 🏗️ Project Structure
 
-### 4. The JSON Codex
-**Concept**: `Codable` and JSON Decoding  
-**Challenge**: Decode a JSON file to find the required answer.
-
-### 5. The Vault Gate
-**Concept**: String Manipulation and Pattern Recognition  
-**Challenge**: Recover correct content from corrupted data by replacing numbers with letters.
-
-## 💾 Data Persistence
-
-The game uses SwiftData to automatically save your progress locally. This means:
-- Your progress is preserved between game sessions
-- You can quit and return later to continue where you left off
-- Progress is stored in your app's container directory
-
-## 🎨 Technical Details
-
-### Architecture
-- **SwiftData**: Local database storage for player progress
-- **ArgumentParser**: Robust CLI argument handling
-- **Async/Await**: Modern Swift concurrency for smooth gameplay
-- **Modular Design**: Clean separation of concerns with dedicated game engine
-
-### File Structure
 ```
-Sources/terminal-of-the-ancients/
-├── terminal_of_the_ancients.swift  # Main CLI entry point
-├── GameEngine.swift                # Core game logic
-└── Models.swift                    # SwiftData models
+TerminalOfTheAncients/
+├── Sources/
+│   └── terminal-of-the-ancients/
+│       ├── Models.swift          # Data models and puzzle definitions
+│       ├── GameEngine.swift      # Core game logic
+│       ├── ASCIIArt.swift        # Visual effects and animations
+│       ├── Sigil.swift           # First puzzle file
+│       └── terminal_of_the_ancients.swift  # CLI entry point
+├── Package.swift                 # Swift Package Manager configuration
+└── README.md                     # This file
 ```
 
-## 🐛 Troubleshooting
+## 🛠️ Development
 
-### Common Issues
+### Adding New Puzzles
 
-1. **"No game progress found"**
-   - Use `--initiate` to start a new game
+Puzzles are defined in `Models.swift` in the `Puzzle.allPuzzles` array. Each puzzle has:
 
-2. **Permission errors with file creation**
-   - Ensure you have write permissions in the current directory
+- `id`: Unique identifier
+- `title`: Display name
+- `description`: What the player needs to do
+- `hint`: Help text when player types "hint"
+- `solution`: The correct answer (for reference)
+- `validator`: A closure that validates player input
 
-3. **SwiftData errors**
-   - Try using `--reset` to clear corrupted data
+### Building and Testing
 
-### Debug Mode
+```bash
+# Build the project
+swift build
 
-For development, you can add debug prints by modifying the source code. The game includes comprehensive error handling and will provide clear feedback for most issues.
+# Run tests (if any)
+swift test
 
-## 🎉 Easter Eggs
+# Run the game
+.build/debug/terminal-of-the-ancients
+```
 
-- Type `xyzzy` during gameplay for a special message
-- Look for hidden patterns in the ASCII art
-- Check the file timestamps for additional lore
+## 🎨 Features
+
+- **Interactive CLI Interface** with colorful ASCII art
+- **Progress Persistence** using SwiftData
+- **Animated Visual Effects** for puzzle completion
+- **Hint System** to help players when stuck
+- **Easter Eggs** for curious explorers
+- **Modular Architecture** for easy puzzle addition
+
+## 📝 License
+
+This project is open source and available under the [MIT License](LICENSE).
 
 ## 🤝 Contributing
 
-1. Fork the repository
-2. Create a feature branch
-3. Add new puzzles or improve existing ones
-4. Test thoroughly
-5. Submit a pull request
+Contributions are welcome! Feel free to:
 
-## 📄 License
+- Add new puzzles
+- Improve ASCII art
+- Enhance the game mechanics
+- Fix bugs
+- Add new features
 
-This project is licensed under the MIT License.
+## 🎉 Acknowledgments
 
-## 🏆 Completion
-
-Once you complete all puzzles, you'll be recognized as a master of the Terminal of the Ancients and gain access to the secrets of the lost Swift civilization!
+- Inspired by classic text adventure games
+- Built with modern Swift features (SwiftData, ArgumentParser, async/await)
+- ASCII art created with love for the terminal aesthetic
 
 ---
 
-*"In the depths of Texel's dunes, the ancient terminal awaits those worthy of its knowledge..."* 
+**Happy coding, digital archaeologist!** 🏛️✨ 
