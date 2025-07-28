@@ -79,8 +79,8 @@ class GameEngine {
                     
                     try? modelContext.save()
                     
-                    // Check if we're moving to task 6 (Shell Script Ritual) and show trapdoor scene
-                    if progress.currentTaskIndex == 6 { // After completing task 5 (Shell Script Ritual)
+                    // Check if we're moving to task 3 (File of Truth) and show trapdoor scene
+                    if progress.currentTaskIndex == 3 { // After completing task 2 (Sigil Compiler)
                         print("\n🚪 As you step forward, the floor beneath you suddenly gives way...")
                         await ASCIIArt.showTrapdoorScene()
                         print("\n🎮 Continue your journey in the hidden chamber below...")

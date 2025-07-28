@@ -64,14 +64,13 @@ The project now includes:
 
 ## Puzzle Structure
 
-The game now has 7 puzzles:
-1. The Sigil Compiler
-2. Welcome Ritual
-3. The Echo Chamber
+The game now has 6 puzzles:
+1. Welcome Ritual
+2. **The Shell Script Ritual** (NEW)
+3. The Sigil Compiler
 4. The File of Truth
 5. The JSON Codex
-6. **The Shell Script Ritual** (NEW)
-7. The Vault Gate
+6. The Vault Gate
 
 ## Tips for Development
 

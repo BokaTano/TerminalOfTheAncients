@@ -31,14 +31,13 @@
 - **Solution**: Player must type "automation" after running the script
 
 ### 4. **Updated Game Structure**
-The game now has **7 puzzles** instead of 6:
-1. The Sigil Compiler
-2. Welcome Ritual  
-3. The Echo Chamber
+The game now has **6 puzzles** instead of 7:
+1. Welcome Ritual
+2. **The Shell Script Ritual** ⭐ NEW
+3. The Sigil Compiler
 4. The File of Truth
 5. The JSON Codex
-6. **The Shell Script Ritual** ⭐ NEW
-7. The Vault Gate
+6. The Vault Gate
 
 ## 🛠️ Technical Implementation
 

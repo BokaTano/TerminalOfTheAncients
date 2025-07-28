@@ -37,7 +37,7 @@ struct TerminalOfTheAncients: AsyncParsableCommand {
         // Create puzzle files if needed
         await createPuzzleFiles()
         
-        // Check if this is the first task (The Sigil Compiler)
+        // Check if this is the first task (Welcome Ritual)
         let descriptor = FetchDescriptor<PlayerProgress>()
         let existingProgress = try modelContext.fetch(descriptor)
         let progress = existingProgress.first ?? PlayerProgress()
@@ -53,15 +53,15 @@ struct TerminalOfTheAncients: AsyncParsableCommand {
             ║                                                              ║
             ║  Welcome, digital archaeologist!                             ║
             ║                                                              ║
-            ║  The ancient compiler hums quietly before you.               ║
+            ║  The ancient terminal awaits your command.                   ║
             ║  A message appears on the screen...                          ║
             ║                                                              ║
-            ║  > "The ancients encoded their secrets inside the source.    ║
-            ║  > Speak the sigil 'illumina' within the sacred file        ║
-            ║  > and reawaken me."                                         ║
+            ║  > "To begin your journey, you must first prove you          ║
+            ║  > understand the ancient CLI ways. Discover the             ║
+            ║  > available commands to proceed."                           ║
             ║                                                              ║
-            ║  You must first awaken the compiler by speaking the          ║
-            ║  correct sigil in the Sigil.swift file.                      ║
+            ║  You must first demonstrate your knowledge of                ║
+            ║  command-line argument parsing.                              ║
             ║                                                              ║
             ║  Press Enter to begin your journey...                        ║
             ╚══════════════════════════════════════════════════════════════╝
@@ -73,20 +73,20 @@ struct TerminalOfTheAncients: AsyncParsableCommand {
         }
         
         // Handle --initiate flag (complete Welcome Ritual automatically)
-        if initiate && progress.currentTaskIndex == 1 {
+        if initiate && progress.currentTaskIndex == 0 {
             print("✅ Welcome Ritual completed! You have proven your knowledge of CLI argument parsing.")
             print("🔓 Access granted to the next chamber...")
             print()
             
             // Show ASCII art for puzzle completion
-            await ASCIIArt.showChamberUnlocked(taskId: 1)
+            await ASCIIArt.showChamberUnlocked(taskId: 0)
             
             // If this is a new progress object, insert it into the context
             if existingProgress.isEmpty {
                 modelContext.insert(progress)
             }
             
-            progress.completedTasks.insert(1)
+            progress.completedTasks.insert(0)
             progress.currentTaskIndex += 1
             progress.lastPlayed = Date()
             

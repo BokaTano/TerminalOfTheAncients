@@ -40,6 +40,25 @@ struct Puzzle {
         return [
             Puzzle(
                 id: 0,
+                title: "Welcome Ritual",
+                description: "To begin your journey, you must first prove you understand the ancient CLI ways. Launch this program with a specific flag to demonstrate your knowledge of argument parsing.",
+                hint: "The ancient ones used flags to control their programs. Try using the help flag to discover available options.",
+                solution: "--initiate",
+                validator: { _ in false } // Handled by main program logic
+            ),
+            Puzzle(
+                id: 1,
+                title: "The Shell Script Ritual",
+                description: "The ancient terminal displays a message:\n> \"The ancients automated their workflows with shell scripts.\n> Execute the sacred build script to prove your mastery.\"\n\nYou must run the build_and_run.sh script and provide the word 'automation' to prove you understand shell scripting.",
+                hint: "Run the build script and then type 'automation' as your answer.",
+                solution: "automation",
+                validator: { input in
+                    // This will be handled by the ShellOut puzzle logic
+                    ShellOutPuzzle.validateShellScriptExecution(input: input)
+                }
+            ),
+            Puzzle(
+                id: 2,
                 title: "The Sigil Compiler",
                 description: "The compiler hums quietly. A message appears:\n> \"The ancients encoded their secrets inside the source.\n> Speak the sigil 'illumina' within the sacred file and reawaken me.\"\n\nYou must modify the Sigil.swift file and rebuild the project.",
                 hint: "Open Sigil.swift and change the empty string to 'illumina', then run 'swift build'.",
@@ -47,22 +66,6 @@ struct Puzzle {
                 validator: { _ in
                     Sigil.playerSigil.lowercased() == "illumina"
                 }
-            ),
-            Puzzle(
-                id: 1,
-                title: "Welcome Ritual",
-                description: "To begin your journey, you must first prove you understand the ancient CLI ways. Launch this program with the '--initiate' flag to demonstrate your knowledge of argument parsing.",
-                hint: "The ancient ones used flags to control their programs. You need to restart this program with a specific flag.",
-                solution: "--initiate",
-                validator: { _ in false } // Handled by main program logic
-            ),
-            Puzzle(
-                id: 2,
-                title: "The Echo Chamber",
-                description: "The ancient terminal echoes your words back to you. To proceed, you must echo back exactly what the terminal says to you. The terminal will say: 'swift'",
-                hint: "Simply type the word that the terminal displays to you.",
-                solution: "swift",
-                validator: { input in input.lowercased() == "swift" }
             ),
             Puzzle(
                 id: 3,
@@ -82,17 +85,6 @@ struct Puzzle {
             ),
             Puzzle(
                 id: 5,
-                title: "The Shell Script Ritual",
-                description: "The ancient terminal displays a message:\n> \"The ancients automated their workflows with shell scripts.\n> Execute the sacred build script to prove your mastery.\"\n\nYou must run the build_and_run.sh script and provide the word 'automation' to prove you understand shell scripting.",
-                hint: "Run the build script and then type 'automation' as your answer.",
-                solution: "automation",
-                validator: { input in
-                    // This will be handled by the ShellOut puzzle logic
-                    ShellOutPuzzle.validateShellScriptExecution(input: input)
-                }
-            ),
-            Puzzle(
-                id: 6,
                 title: "The Vault Gate",
                 description: "The terminal displays corrupted data: 'T3rm1n4l_0f_th3_4nc13nts'. You must recover the correct content by replacing numbers with letters (3→e, 4→a, 1→l, 0→o).",
                 hint: "Look at the pattern: numbers are being used as letters. 3=e, 4=a, 1=l, 0=o",
