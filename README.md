@@ -51,14 +51,15 @@ swift build
 
 ## 🧩 Puzzles
 
-The game features 6 unique puzzles that teach Swift programming concepts:
+The game features 7 unique puzzles that teach Swift programming concepts:
 
 1. **Welcome Ritual** - Learn CLI help discovery and argument parsing
 2. **The Shell Script Ritual** - Execute shell scripts with ShellOut
-3. **The Sigil Compiler** - Modify source code and rebuild
-4. **The File of Truth** - File reading operations
-5. **The JSON Codex** - JSON parsing and decoding
-6. **The Vault Gate** - String manipulation and pattern recognition
+3. **Restore the Glyph Matrix** - SwiftData, Process execution, and ASCII reconstruction
+4. **The Sigil Compiler** - Modify source code and rebuild
+5. **The File of Truth** - File reading operations
+6. **The JSON Codex** - JSON parsing and decoding
+7. **The Vault Gate** - String manipulation and pattern recognition
 
 ## 🏗️ Project Structure
 

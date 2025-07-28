@@ -17,6 +17,19 @@ final class PlayerProgress {
     }
 }
 
+@Model
+final class Glyph {
+    var x: Int
+    var y: Int
+    var symbol: String
+
+    init(x: Int, y: Int, symbol: String) {
+        self.x = x
+        self.y = y
+        self.symbol = symbol
+    }
+}
+
 
 
 struct Puzzle {
@@ -59,6 +72,17 @@ struct Puzzle {
             ),
             Puzzle(
                 id: 2,
+                title: "Restore the Glyph Matrix",
+                description: "The lighthouse beacon has gone dark. Write a Swift script that reads glyphs from SwiftData and reconstructs the ASCII art.",
+                hint: "Use the provided render_glyphs.swift as a starting point. Compile it and provide the binary path.",
+                solution: "glyph_matrix",
+                validator: { input in
+                    // This will be handled by the GlyphMatrixPuzzle logic
+                    GlyphMatrixPuzzle.validateGlyphMatrix(input: input)
+                }
+            ),
+            Puzzle(
+                id: 3,
                 title: "The Sigil Compiler",
                 description: "The compiler hums quietly. A message appears:\n> \"The ancients encoded their secrets inside the source.\n> Speak the sigil 'illumina' within the sacred file and reawaken me.\"\n\nYou must modify the Sigil.swift file and rebuild the project.",
                 hint: "Open Sigil.swift and change the empty string to 'illumina', then run 'swift build'.",
@@ -68,7 +92,7 @@ struct Puzzle {
                 }
             ),
             Puzzle(
-                id: 3,
+                id: 4,
                 title: "The File of Truth",
                 description: "A mysterious file has appeared in your current directory: 'secret_code.txt'. Read its contents and extract the secret code hidden within.",
                 hint: "The file contains a simple text message. Look for any words that might be a code or password.",
@@ -76,7 +100,7 @@ struct Puzzle {
                 validator: { input in input.lowercased() == "ancient" }
             ),
             Puzzle(
-                id: 4,
+                id: 5,
                 title: "The JSON Codex",
                 description: "The ancients left behind a JSON file called 'treasure.json'. Decode it to find the required answer. The file contains an object with a 'key' field.",
                 hint: "Parse the JSON and look for the value of the 'key' field.",
@@ -84,7 +108,7 @@ struct Puzzle {
                 validator: { input in input.lowercased() == "swiftdata" }
             ),
             Puzzle(
-                id: 5,
+                id: 6,
                 title: "The Vault Gate",
                 description: "The terminal displays corrupted data: 'T3rm1n4l_0f_th3_4nc13nts'. You must recover the correct content by replacing numbers with letters (3→e, 4→a, 1→l, 0→o).",
                 hint: "Look at the pattern: numbers are being used as letters. 3=e, 4=a, 1=l, 0=o",
@@ -108,5 +132,14 @@ class ShellOutPuzzle {
             print("❌ Shell script execution failed: \(error)")
             return false
         }
+    }
+}
+
+// Helper class for Glyph Matrix puzzle
+class GlyphMatrixPuzzle {
+    static func validateGlyphMatrix(input: String) -> Bool {
+        // This will be handled by the main game logic
+        // The actual validation happens in the GameEngine
+        return false
     }
 } 

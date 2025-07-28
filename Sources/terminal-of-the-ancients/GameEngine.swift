@@ -1,5 +1,6 @@
 import Foundation
 import SwiftData
+import CryptoKit
 
 class GameEngine {
     private let tasks: [Puzzle]
@@ -40,6 +41,11 @@ class GameEngine {
     }
     
     private func playTask(_ task: Puzzle, progress: PlayerProgress) async -> Bool {
+        // Special handling for Glyph Matrix puzzle
+        if task.id == 2 { // Glyph Matrix puzzle
+            return await playGlyphMatrixTask(task, progress: progress)
+        }
+        
         while true {
             print("💭 Enter your answer (or 'hint' for help, 'quit' to exit):")
             guard let input = readLine()?.trimmingCharacters(in: .whitespacesAndNewlines) else {
@@ -79,8 +85,8 @@ class GameEngine {
                     
                     try? modelContext.save()
                     
-                    // Check if we're moving to task 3 (File of Truth) and show trapdoor scene
-                    if progress.currentTaskIndex == 3 { // After completing task 2 (Sigil Compiler)
+                    // Check if we're moving to task 3 (Sigil Compiler) and show trapdoor scene
+                    if progress.currentTaskIndex == 3 { // After completing task 2 (Glyph Matrix)
                         print("\n🚪 As you step forward, the floor beneath you suddenly gives way...")
                         await ASCIIArt.showTrapdoorScene()
                         print("\n🎮 Continue your journey in the hidden chamber below...")
@@ -91,6 +97,93 @@ class GameEngine {
                 } else {
                     print("❌ Incorrect. The ancient terminal rejects your answer.")
                     print("💡 Try again or type 'hint' for guidance.")
+                    print()
+                }
+            }
+        }
+    }
+    
+    private func playGlyphMatrixTask(_ task: Puzzle, progress: PlayerProgress) async -> Bool {
+        // Seed the glyph matrix first
+        do {
+            try await seedGlyphMatrix()
+        } catch {
+            print("❌ Failed to seed glyph matrix: \(error)")
+            return false
+        }
+        
+        print("🗼 The lighthouse beacon has gone dark. Glyphs have been seeded in SwiftData.")
+        print("💡 Use render_glyphs.swift to reconstruct the ASCII art.")
+        print()
+        
+        while true {
+            print("💭 Enter the path to your compiled Swift binary (or 'hint' for help, 'quit' to exit):")
+            guard let input = readLine()?.trimmingCharacters(in: .whitespacesAndNewlines) else {
+                print("❌ No input available. Exiting...")
+                return false
+            }
+            
+            switch input.lowercased() {
+            case "quit", "exit":
+                print("👋 Farewell, digital archaeologist. Your progress has been saved.")
+                return false
+                
+            case "hint":
+                print("💡 Hint: \(task.hint)")
+                print("📁 The script should be compiled and executable.")
+                print("🔧 Example: swiftc render_glyphs.swift -o render_glyphs")
+                print()
+                continue
+                
+            case "xyzzy":
+                print("🌟 Nothing happens... or does it? You've discovered an ancient easter egg!")
+                print()
+                continue
+                
+            default:
+                // Validate the binary path
+                let fileManager = FileManager.default
+                guard fileManager.fileExists(atPath: input) else {
+                    print("❌ Binary not found at path: \(input)")
+                    print("💡 Make sure the path is correct and the file exists.")
+                    print()
+                    continue
+                }
+                
+                // Try to run the script
+                do {
+                    let isValid = try await validateGlyphMatrixScript(binaryPath: input)
+                    
+                    if isValid {
+                        print("✅ The beacon shines again. Its coordinates are 53.179N 4.855E.")
+                        print("🔓 In the next puzzle, you will need these numbers...")
+                        print()
+                        
+                        // Show ASCII art for puzzle completion
+                        await ASCIIArt.showChamberUnlocked(taskId: task.id)
+                        
+                        progress.completedTasks.insert(task.id)
+                        progress.currentTaskIndex += 1
+                        progress.lastPlayed = Date()
+                        
+                        try? modelContext.save()
+                        
+                        // Check if we're moving to task 3 (Sigil Compiler) and show trapdoor scene
+                        if progress.currentTaskIndex == 3 { // After completing task 2 (Glyph Matrix)
+                            print("\n🚪 As you step forward, the floor beneath you suddenly gives way...")
+                            await ASCIIArt.showTrapdoorScene()
+                            print("\n🎮 Continue your journey in the hidden chamber below...")
+                        }
+                        
+                        return true
+                    } else {
+                        print("❌ The matrix is malformed. Perhaps you have a missing glyph? Or the spacing is off?")
+                        print("💡 Try again.")
+                        print()
+                    }
+                } catch {
+                    print("❌ Failed to run script: \(error)")
+                    print("💡 Make sure the script is compiled and executable.")
                     print()
                 }
             }
@@ -119,8 +212,118 @@ class GameEngine {
             modelContext.delete(progress)
         }
         
+        // Also clear glyphs
+        let glyphDescriptor = FetchDescriptor<Glyph>()
+        let existingGlyphs = try modelContext.fetch(glyphDescriptor)
+        for glyph in existingGlyphs {
+            modelContext.delete(glyph)
+        }
+        
         try modelContext.save()
         print("🔄 Game reset! All progress has been cleared.")
+    }
+    
+    // MARK: - Glyph Matrix Puzzle
+    
+    func seedGlyphMatrix() async throws {
+        // Clear existing glyphs
+        let descriptor = FetchDescriptor<Glyph>()
+        let existingGlyphs = try modelContext.fetch(descriptor)
+        for glyph in existingGlyphs {
+            modelContext.delete(glyph)
+        }
+        
+        // Create lighthouse ASCII art
+        let lighthouseASCII = """
+        ╔══════════════════════════════════════════════════════════════╗
+        ║                    🗼 LIGHTHOUSE OF EIERLAND 🗼                ║
+        ║                                                              ║
+        ║                  ___            %.                           ║
+        ║           __  __/__/I__  ______% %%'                         ║
+        ║          / __/_[___]/_/I--.   /%%%%                         ║
+        ║         / /  I_/=/I__I/  /I  // )(                          ║
+        ║        / /____/=/ /_____//  //                               ║
+        ║       /  I___/=/ /_____I/  //                                ║
+        ║      /______/=/ /_________//                                 ║
+        ║      I_____/=/ /_________I/MJP                               ║
+        ║           /=/_/                                               ║
+        ║                                                              ║
+        ║  The ancient lighthouse stands tall, its beacon              ║
+        ║  guiding ships through the treacherous waters.               ║
+        ║                                                              ║
+        ║  Coordinates: 53.179N 4.855E                                 ║
+        ╚══════════════════════════════════════════════════════════════╝
+        """
+        
+        // Convert ASCII to glyphs
+        let lines = lighthouseASCII.components(separatedBy: .newlines)
+        var glyphCount = 0
+        for (y, line) in lines.enumerated() {
+            for (x, char) in line.enumerated() {
+                let glyph = Glyph(x: x, y: y, symbol: String(char))
+                modelContext.insert(glyph)
+                glyphCount += 1
+            }
+        }
+        
+        try modelContext.save()
+        
+        // Verify the glyphs were saved
+        let glyphDescriptor = FetchDescriptor<Glyph>()
+        let savedGlyphs = try modelContext.fetch(glyphDescriptor)
+        print("🗼 Seeded \(glyphCount) glyphs in the store, verified \(savedGlyphs.count) saved")
+    }
+    
+    func validateGlyphMatrixScript(binaryPath: String) async throws -> Bool {
+        // Create process to run the script - use the same default store as the game
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: binaryPath)
+        // Don't pass store URL - let the script use the same default store as the game
+        process.arguments = []
+        
+        // Capture stdout
+        let pipe = Pipe()
+        process.standardOutput = pipe
+        process.standardError = pipe
+        
+        try process.run()
+        process.waitUntilExit()
+        
+        let data = pipe.fileHandleForReading.readDataToEndOfFile()
+        let output = String(data: data, encoding: .utf8) ?? ""
+        
+        // Normalize line endings and trim whitespace
+        let normalizedOutput = output
+            .replacingOccurrences(of: "\r\n", with: "\n")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        // Get expected ASCII
+        let expectedASCII = """
+        ╔══════════════════════════════════════════════════════════════╗
+        ║                    🗼 LIGHTHOUSE OF EIERLAND 🗼                ║
+        ║                                                              ║
+        ║                  ___            %.                           ║
+        ║           __  __/__/I__  ______% %%'                         ║
+        ║          / __/_[___]/_/I--.   /%%%%                         ║
+        ║         / /  I_/=/I__I/  /I  // )(                          ║
+        ║        / /____/=/ /_____//  //                               ║
+        ║       /  I___/=/ /_____I/  //                                ║
+        ║      /______/=/ /_________//                                 ║
+        ║      I_____/=/ /_________I/MJP                               ║
+        ║           /=/_/                                               ║
+        ║                                                              ║
+        ║  The ancient lighthouse stands tall, its beacon              ║
+        ║  guiding ships through the treacherous waters.               ║
+        ║                                                              ║
+        ║  Coordinates: 53.179N 4.855E                                 ║
+        ╚══════════════════════════════════════════════════════════════╝
+        """
+        
+        // Compare using SHA256
+        let outputHash = SHA256.hash(data: normalizedOutput.data(using: .utf8) ?? Data())
+        let expectedHash = SHA256.hash(data: expectedASCII.data(using: .utf8) ?? Data())
+        
+        return outputHash == expectedHash
     }
     
     private func printBanner() {

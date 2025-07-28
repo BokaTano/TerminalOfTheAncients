@@ -18,8 +18,11 @@ struct TerminalOfTheAncients: AsyncParsableCommand {
     @Flag(name: .long, help: "Show game status and progress")
     var status = false
     
+    @Option(name: .long, help: "Jump to a specific puzzle (0-6)")
+    var jump: Int?
+    
     mutating func run() async throws {
-        let modelContainer = try ModelContainer(for: PlayerProgress.self)
+        let modelContainer = try ModelContainer(for: PlayerProgress.self, Glyph.self)
         let modelContext = ModelContext(modelContainer)
         let gameEngine = GameEngine(modelContext: modelContext)
         
@@ -31,6 +34,11 @@ struct TerminalOfTheAncients: AsyncParsableCommand {
         
         if status {
             await showStatus(modelContext: modelContext)
+            return
+        }
+        
+        if let jumpPuzzle = jump {
+            try await jumpToPuzzle(jumpPuzzle, modelContext: modelContext)
             return
         }
         
@@ -164,5 +172,37 @@ struct TerminalOfTheAncients: AsyncParsableCommand {
         } catch {
             // File might already exist, that's okay
         }
+    }
+    
+    private func jumpToPuzzle(_ puzzleId: Int, modelContext: ModelContext) async throws {
+        let tasks = Puzzle.allPuzzles
+        
+        guard puzzleId >= 0 && puzzleId < tasks.count else {
+            print("❌ Invalid puzzle ID. Available puzzles: 0-\(tasks.count - 1)")
+            return
+        }
+        
+        let descriptor = FetchDescriptor<PlayerProgress>()
+        let existingProgress = try modelContext.fetch(descriptor)
+        let progress = existingProgress.first ?? PlayerProgress()
+        
+        // If this is a new progress object, insert it into the context
+        if existingProgress.isEmpty {
+            modelContext.insert(progress)
+        }
+        
+        // Complete all puzzles up to the target puzzle
+        for i in 0..<puzzleId {
+            progress.completedTasks.insert(i)
+        }
+        
+        // Set current task to the target puzzle
+        progress.currentTaskIndex = puzzleId
+        progress.lastPlayed = Date()
+        
+        try modelContext.save()
+        
+        print("✅ Jumped to puzzle \(puzzleId): \(tasks[puzzleId].title)")
+        print("🎮 You can now continue your journey by running the game without flags.")
     }
 }
