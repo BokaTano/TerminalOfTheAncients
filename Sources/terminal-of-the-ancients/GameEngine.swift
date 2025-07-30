@@ -116,6 +116,18 @@ class GameEngine {
         print("💡 Use render_glyphs.swift to reconstruct the ASCII art.")
         print()
         
+        // Show what the lighthouse should look like
+        print("🎯 This is what your script should output:")
+        print(String(repeating: "─", count: 60))
+        let red = "\u{001B}[31m"
+        let gray = "\u{001B}[90m"
+        let reset = "\u{001B}[0m"
+        
+        let lighthouseASCII = "\(gray)        |\n        |\n       /_\\\n       |\(red)#\(gray)|\n       |\(red)#\(gray)|\n      /\(red)###\(gray)\\\n      |\(red)###\(gray)|\n------|\(red)###\(gray)|------\n      |\(red)###\(gray)|\n      |\(red)###\(gray)|\n      '---'\n  \(reset)EIERLAND LIGHTHOUSE\n   53.179N 4.855E"
+        print(lighthouseASCII)
+        print(String(repeating: "─", count: 60))
+        print()
+        
         while true {
             print("💭 Enter the path to your compiled Swift binary (or 'hint' for help, 'quit' to exit):")
             guard let input = readLine()?.trimmingCharacters(in: .whitespacesAndNewlines) else {
@@ -234,26 +246,7 @@ class GameEngine {
         }
         
         // Create lighthouse ASCII art
-        let lighthouseASCII = """
-        ╔══════════════════════════════════════════════════════════════╗
-        ║                    🗼 LIGHTHOUSE OF EIERLAND 🗼                ║
-        ║                                                              ║
-        ║                  ___            %.                           ║
-        ║           __  __/__/I__  ______% %%'                         ║
-        ║          / __/_[___]/_/I--.   /%%%%                         ║
-        ║         / /  I_/=/I__I/  /I  // )(                          ║
-        ║        / /____/=/ /_____//  //                               ║
-        ║       /  I___/=/ /_____I/  //                                ║
-        ║      /______/=/ /_________//                                 ║
-        ║      I_____/=/ /_________I/MJP                               ║
-        ║           /=/_/                                               ║
-        ║                                                              ║
-        ║  The ancient lighthouse stands tall, its beacon              ║
-        ║  guiding ships through the treacherous waters.               ║
-        ║                                                              ║
-        ║  Coordinates: 53.179N 4.855E                                 ║
-        ╚══════════════════════════════════════════════════════════════╝
-        """
+        let lighthouseASCII = "        |\n        |\n       /_\\\n       |#|\n       |#|\n      /###\\\n      |###|\n------|###|------\n      |###|\n      |###|\n      '---'\n  EIERLAND LIGHTHOUSE\n   53.179N 4.855E"
         
         // Convert ASCII to glyphs
         let lines = lighthouseASCII.components(separatedBy: .newlines)
@@ -292,32 +285,17 @@ class GameEngine {
         let data = pipe.fileHandleForReading.readDataToEndOfFile()
         let output = String(data: data, encoding: .utf8) ?? ""
         
-        // Normalize line endings and trim whitespace
+        // Normalize line endings, strip ANSI color codes, and trim only trailing whitespace
         let normalizedOutput = output
             .replacingOccurrences(of: "\r\n", with: "\n")
-            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .replacingOccurrences(of: #"\u{001B}\[[0-9;]*m"#, with: "", options: .regularExpression)
+            .replacingOccurrences(of: #" +$"#, with: "", options: .regularExpression) // Only trim trailing spaces
+            .replacingOccurrences(of: #"\n+$"#, with: "", options: .regularExpression) // Remove trailing newlines
         
         // Get expected ASCII
-        let expectedASCII = """
-        ╔══════════════════════════════════════════════════════════════╗
-        ║                    🗼 LIGHTHOUSE OF EIERLAND 🗼                ║
-        ║                                                              ║
-        ║                  ___            %.                           ║
-        ║           __  __/__/I__  ______% %%'                         ║
-        ║          / __/_[___]/_/I--.   /%%%%                         ║
-        ║         / /  I_/=/I__I/  /I  // )(                          ║
-        ║        / /____/=/ /_____//  //                               ║
-        ║       /  I___/=/ /_____I/  //                                ║
-        ║      /______/=/ /_________//                                 ║
-        ║      I_____/=/ /_________I/MJP                               ║
-        ║           /=/_/                                               ║
-        ║                                                              ║
-        ║  The ancient lighthouse stands tall, its beacon              ║
-        ║  guiding ships through the treacherous waters.               ║
-        ║                                                              ║
-        ║  Coordinates: 53.179N 4.855E                                 ║
-        ╚══════════════════════════════════════════════════════════════╝
-        """
+        let expectedASCII = "        |\n        |\n       /_\\\n       |#|\n       |#|\n      /###\\\n      |###|\n------|###|------\n      |###|\n      |###|\n      '---'\n  EIERLAND LIGHTHOUSE\n   53.179N 4.855E"
+        
+
         
         // Compare using SHA256
         let outputHash = SHA256.hash(data: normalizedOutput.data(using: .utf8) ?? Data())

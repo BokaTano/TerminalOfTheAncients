@@ -96,9 +96,13 @@ for g in glyphs {
     grid[g.y][g.x] = g.symbol.isEmpty ? " " : String(g.symbol.prefix(1))
 }
 
-// Join into ASCII and trim trailing spaces from each line
+// Join into ASCII and trim only trailing spaces from each line (keep leading spaces)
 let ascii = grid.map { line in
-    line.joined().trimmingCharacters(in: .whitespaces)
+    let joined = line.joined()
+    // Only trim trailing spaces, keep leading spaces
+    return joined.replacingOccurrences(of: #" +$"#, with: "", options: .regularExpression)
 }.joined(separator: "\n")
 
-print(ascii) 
+// For now, output plain ASCII (colors can be added later as enhancement)
+// Only remove trailing newline, keep leading spaces
+print(ascii.replacingOccurrences(of: #"\n+$"#, with: "", options: .regularExpression)) 
