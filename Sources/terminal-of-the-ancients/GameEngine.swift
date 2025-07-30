@@ -46,6 +46,11 @@ class GameEngine {
             return await playGlyphMatrixTask(task, progress: progress)
         }
         
+        // Special handling for Beacon puzzle
+        if task.id == 3 { // Beacon puzzle
+            return await playBeaconTask(task, progress: progress)
+        }
+        
         while true {
             print("💭 Enter your answer (or 'hint' for help, 'quit' to exit):")
             guard let input = readLine()?.trimmingCharacters(in: .whitespacesAndNewlines) else {
@@ -199,6 +204,40 @@ class GameEngine {
                     print()
                 }
             }
+        }
+    }
+    
+    // MARK: - Beacon Puzzle
+    
+    private func playBeaconTask(_ task: Puzzle, progress: PlayerProgress) async -> Bool {
+        print("🗼 The lighthouse has awakened. It now sends continuous tidal data through the air.")
+        print("🌊 The water is rising. You're standing deep in a coastal cave—and something is whispering...")
+        print()
+        
+        let beaconTask = BeaconPuzzleTask()
+        
+        do {
+            try await beaconTask.runPuzzle()
+            
+            print("✅ The beacon analysis is complete!")
+            print("🔓 Access granted to the next chamber...")
+            print()
+            
+            // Show ASCII art for puzzle completion
+            await ASCIIArt.showChamberUnlocked(taskId: task.id)
+            
+            progress.completedTasks.insert(task.id)
+            progress.currentTaskIndex += 1
+            progress.lastPlayed = Date()
+            
+            try? modelContext.save()
+            
+            return true
+        } catch {
+            print("❌ Beacon analysis failed: \(error)")
+            print("💡 Try again or type 'hint' for guidance.")
+            print()
+            return false
         }
     }
     
