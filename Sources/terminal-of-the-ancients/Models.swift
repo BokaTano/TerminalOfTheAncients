@@ -80,7 +80,7 @@ struct Puzzle {
                 description:
                     "The lighthouse beacon has gone dark. Write a Swift script that reads glyphs from SwiftData and reconstructs the ASCII art.",
                 hint:
-                    "Use the provided render_glyphs.swift as a starting point. Compile it and provide the binary path.",
+                    "Use the provided render_glyphs.swift tool. Run it with: ./run_render_glyphs.sh",
                 solution: "glyph_matrix",
                 validator: { input in
                     // This will be handled by the GlyphMatrixPuzzle logic

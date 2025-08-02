@@ -17,6 +17,24 @@
             "name": "Release terminal-of-the-ancients",
             "program": "${workspaceFolder:TerminalOfTheAncients}/.build/release/terminal-of-the-ancients",
             "preLaunchTask": "swift: Build Release terminal-of-the-ancients"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:TerminalOfTheAncients}",
+            "name": "Debug render-glyphs",
+            "program": "${workspaceFolder:TerminalOfTheAncients}/.build/debug/render-glyphs",
+            "preLaunchTask": "swift: Build Debug render-glyphs"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:TerminalOfTheAncients}",
+            "name": "Release render-glyphs",
+            "program": "${workspaceFolder:TerminalOfTheAncients}/.build/release/render-glyphs",
+            "preLaunchTask": "swift: Build Release render-glyphs"
         }
     ]
 }

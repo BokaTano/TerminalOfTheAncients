@@ -1,18 +1,17 @@
 import CryptoKit
 import Foundation
-import SwiftData
 
 class GameEngine {
     private let tasks: [Puzzle]
-    private let modelContext: ModelContext
+    private let dataService: GameDataService
 
-    init(modelContext: ModelContext) {
-        self.modelContext = modelContext
+    init(dataService: GameDataService) {
+        self.dataService = dataService
         self.tasks = Puzzle.allPuzzles
     }
 
     func startGame() async throws {
-        let progress = try await loadOrCreateProgress()
+        let progress = try await dataService.loadOrCreateProgress()
 
         // Main game loop
         while progress.currentTaskIndex < tasks.count {
@@ -90,9 +89,9 @@ class GameEngine {
                     progress.currentTaskIndex += 1
                     progress.lastPlayed = Date()
 
-                    try? modelContext.save()
+                    try? await dataService.saveProgress(progress)
 
-                    // Check if we're moving to task 3 (Sigil Compiler) and show trapdoor scene
+                    // Check if we're moving to task 3 and show trapdoor scene
                     if progress.currentTaskIndex == 3 {  // After completing task 2 (Glyph Matrix)
                         print(
                             "\n🚪 As you step forward, the floor beneath you suddenly gives way...")
@@ -114,7 +113,7 @@ class GameEngine {
     private func playGlyphMatrixTask(_ task: Puzzle, progress: PlayerProgress) async -> Bool {
         // Seed the glyph matrix first
         do {
-            try await seedGlyphMatrix()
+            try await dataService.seedGlyphMatrix()
         } catch {
             print("❌ Failed to seed glyph matrix: \(error)")
             return false
@@ -193,7 +192,7 @@ class GameEngine {
                         progress.currentTaskIndex += 1
                         progress.lastPlayed = Date()
 
-                        try? modelContext.save()
+                        try? await dataService.saveProgress(progress)
 
                         // Check if we're moving to task 3 (Sigil Compiler) and show trapdoor scene
                         if progress.currentTaskIndex == 3 {  // After completing task 2 (Glyph Matrix)
@@ -250,7 +249,7 @@ class GameEngine {
             progress.currentTaskIndex += 1
             progress.lastPlayed = Date()
 
-            try? modelContext.save()
+            try? await dataService.saveProgress(progress)
 
             return true
         } catch {
@@ -261,70 +260,9 @@ class GameEngine {
         }
     }
 
-    private func loadOrCreateProgress() async throws -> PlayerProgress {
-        let descriptor = FetchDescriptor<PlayerProgress>()
-        let existingProgress = try modelContext.fetch(descriptor)
-
-        if let progress = existingProgress.first {
-            return progress
-        } else {
-            let newProgress = PlayerProgress()
-            modelContext.insert(newProgress)
-            try modelContext.save()
-            return newProgress
-        }
-    }
-
     func resetGame() async throws {
-        let descriptor = FetchDescriptor<PlayerProgress>()
-        let existingProgress = try modelContext.fetch(descriptor)
-
-        for progress in existingProgress {
-            modelContext.delete(progress)
-        }
-
-        // Also clear glyphs
-        let glyphDescriptor = FetchDescriptor<Glyph>()
-        let existingGlyphs = try modelContext.fetch(glyphDescriptor)
-        for glyph in existingGlyphs {
-            modelContext.delete(glyph)
-        }
-
-        try modelContext.save()
+        try await dataService.resetGame()
         print("🔄 Game reset! All progress has been cleared.")
-    }
-
-    // MARK: - Glyph Matrix Puzzle
-
-    func seedGlyphMatrix() async throws {
-        // Clear existing glyphs
-        let descriptor = FetchDescriptor<Glyph>()
-        let existingGlyphs = try modelContext.fetch(descriptor)
-        for glyph in existingGlyphs {
-            modelContext.delete(glyph)
-        }
-
-        // Create lighthouse ASCII art
-        let lighthouseASCII =
-            "        |\n        |\n       /_\\\n       |#|\n       |#|\n      /###\\\n      |###|\n------|###|------\n      |###|\n      |###|\n      '---'\n  EIERLAND LIGHTHOUSE\n   53.179N 4.855E"
-
-        // Convert ASCII to glyphs
-        let lines = lighthouseASCII.components(separatedBy: .newlines)
-        var glyphCount = 0
-        for (y, line) in lines.enumerated() {
-            for (x, char) in line.enumerated() {
-                let glyph = Glyph(x: x, y: y, symbol: String(char))
-                modelContext.insert(glyph)
-                glyphCount += 1
-            }
-        }
-
-        try modelContext.save()
-
-        // Verify the glyphs were saved
-        let glyphDescriptor = FetchDescriptor<Glyph>()
-        let savedGlyphs = try modelContext.fetch(glyphDescriptor)
-        print("🗼 Seeded \(glyphCount) glyphs in the store, verified \(savedGlyphs.count) saved")
     }
 
     func validateGlyphMatrixScript(binaryPath: String) async throws -> Bool {

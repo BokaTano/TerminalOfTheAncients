@@ -12,12 +12,13 @@ let package = Package(
         .executable(
             name: "terminal-of-the-ancients",
             targets: ["terminal-of-the-ancients"]
-        ),
+        )
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-argument-parser", from: "1.3.0"),
         .package(url: "https://github.com/onevcat/Rainbow", from: "4.0.0"),
         .package(url: "https://github.com/JohnSundell/ShellOut", from: "2.3.0"),
+        .package(url: "https://github.com/vapor/vapor", from: "4.0.0"),
     ],
     targets: [
         .executableTarget(
@@ -26,8 +27,10 @@ let package = Package(
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
                 .product(name: "Rainbow", package: "Rainbow"),
                 .product(name: "ShellOut", package: "ShellOut"),
+                .product(name: "Vapor", package: "vapor"),
             ],
             path: "Sources/terminal-of-the-ancients"
-        ),
+        )
+
     ]
 )

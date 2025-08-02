@@ -24,10 +24,8 @@ func parseArgs() -> Args {
 }
 
 let args = parseArgs()
-// Use default store if no store path provided (same as game)
-let storePath = args.store.isEmpty ? "" : args.store
 
-// MARK: - Model
+// MARK: - SwiftData Logic and Models (same as GameDataService)
 
 @Model
 final class PlayerProgress {
@@ -35,7 +33,7 @@ final class PlayerProgress {
     var completedTasks: Set<Int>
     var lastPlayed: Date
     var createdAt: Date
-    
+
     init() {
         self.currentTaskIndex = 0
         self.completedTasks = []
@@ -57,30 +55,38 @@ final class Glyph {
     }
 }
 
-// MARK: - SwiftData bootstrap
-
-// Use the exact same ModelContainer configuration as the game
-let container: ModelContainer
-if storePath.isEmpty {
-    // Use default store (same as game)
-    container = try ModelContainer(for: PlayerProgress.self, Glyph.self)
-} else {
-    // Use specified store path with same configuration as game
-    let storeURL = URL(fileURLWithPath: storePath)
-    let config = ModelConfiguration(url: storeURL)
-    container = try ModelContainer(for: PlayerProgress.self, Glyph.self, configurations: config)
+func createModelContainer(storePath: String?) throws -> ModelContainer {
+    if let storePath = storePath, !storePath.isEmpty {
+        // Use specified store path
+        let storeURL = URL(fileURLWithPath: storePath)
+        let config = ModelConfiguration(url: storeURL)
+        return try ModelContainer(for: PlayerProgress.self, Glyph.self, configurations: config)
+    } else {
+        // Use default store
+        return try ModelContainer(for: PlayerProgress.self, Glyph.self)
+    }
 }
+
+func getSortedGlyphs(context: ModelContext) throws -> [Glyph] {
+    let descriptor = FetchDescriptor<Glyph>(sortBy: [
+        .init(\.y, order: .forward),
+        .init(\.x, order: .forward),
+    ])
+    return try context.fetch(descriptor)
+}
+
+// MARK: - Main Execution
+
+// Create container and context using same logic as GameDataService
+let container = try createModelContainer(storePath: args.store.isEmpty ? nil : args.store)
 let context = ModelContext(container)
 
-let fetch = FetchDescriptor<Glyph>(sortBy: [
-    .init(\.y, order: .forward),
-    .init(\.x, order: .forward)
-])
-
-let glyphs = try context.fetch(fetch)
+// Get sorted glyphs using same logic as GameDataService
+let glyphs = try getSortedGlyphs(context: context)
 
 guard let maxX = glyphs.map(\.x).max(),
-      let maxY = glyphs.map(\.y).max() else {
+    let maxY = glyphs.map(\.y).max()
+else {
     fputs("No glyphs found in store.\n", stderr)
     exit(1)
 }
@@ -105,4 +111,4 @@ let ascii = grid.map { line in
 
 // For now, output plain ASCII (colors can be added later as enhancement)
 // Only remove trailing newline, keep leading spaces
-print(ascii.replacingOccurrences(of: #"\n+$"#, with: "", options: .regularExpression)) 
+print(ascii.replacingOccurrences(of: #"\n+$"#, with: "", options: .regularExpression))

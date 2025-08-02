@@ -1,6 +1,5 @@
 import ArgumentParser
 import Foundation
-import SwiftData
 
 @main
 struct TerminalOfTheAncients: AsyncParsableCommand {
@@ -22,30 +21,27 @@ struct TerminalOfTheAncients: AsyncParsableCommand {
     var jump: Int?
 
     mutating func run() async throws {
-        let modelContainer = try ModelContainer(for: PlayerProgress.self, Glyph.self)
-        let modelContext = ModelContext(modelContainer)
-        let gameEngine = GameEngine(modelContext: modelContext)
+        let dataService = try GameDataService()
+        let gameEngine = GameEngine(dataService: dataService)
 
-        // Handle special commands first
+        // Handle convenience commands first
         if reset {
             try await gameEngine.resetGame()
             return
         }
 
         if status {
-            await showStatus(modelContext: modelContext)
+            await showStatus(dataService: dataService)
             return
         }
 
         if let jumpPuzzle = jump {
-            try await jumpToPuzzle(jumpPuzzle, modelContext: modelContext)
+            try await jumpToPuzzle(jumpPuzzle, dataService: dataService)
             return
         }
 
         // Check if this is the first task (Welcome Ritual)
-        let descriptor = FetchDescriptor<PlayerProgress>()
-        let existingProgress = try modelContext.fetch(descriptor)
-        let progress = existingProgress.first ?? PlayerProgress()
+        let progress = try await dataService.loadOrCreateProgress()
 
         if progress.currentTaskIndex == 0 && !initiate {
             print(
@@ -97,16 +93,11 @@ struct TerminalOfTheAncients: AsyncParsableCommand {
             // Show ASCII art for puzzle completion
             await ASCIIArt.showChamberUnlocked(taskId: 0)
 
-            // If this is a new progress object, insert it into the context
-            if existingProgress.isEmpty {
-                modelContext.insert(progress)
-            }
-
             progress.completedTasks.insert(0)
             progress.currentTaskIndex += 1
             progress.lastPlayed = Date()
 
-            try modelContext.save()
+            try await dataService.saveProgress(progress)
 
             print("🎮 You can now continue your journey by running the game without flags.")
             return
@@ -116,41 +107,36 @@ struct TerminalOfTheAncients: AsyncParsableCommand {
         try await gameEngine.startGame()
     }
 
-    private func showStatus(modelContext: ModelContext) async {
-        let descriptor = FetchDescriptor<PlayerProgress>()
+    private func showStatus(dataService: GameDataService) async {
         do {
-            let existingProgress = try modelContext.fetch(descriptor)
-            if let progress = existingProgress.first {
-                let tasks = Puzzle.allPuzzles
-                print(
-                    """
+            let progress = try await dataService.loadOrCreateProgress()
+            let tasks = Puzzle.allPuzzles
+            print(
+                """
 
-                    📊 GAME STATUS
-                    ──────────────────────────────────────────────────────────
-                    🎮 Current Task: \(progress.currentTaskIndex + 1) of \(tasks.count)
-                    ✅ Completed Tasks: \(progress.completedTasks.count)/\(tasks.count)
-                    📅 Last Played: \(progress.lastPlayed.formatted())
-                    🕐 Created: \(progress.createdAt.formatted())
+                📊 GAME STATUS
+                ──────────────────────────────────────────────────────────
+                🎮 Current Task: \(progress.currentTaskIndex + 1) of \(tasks.count)
+                ✅ Completed Tasks: \(progress.completedTasks.count)/\(tasks.count)
+                📅 Last Played: \(progress.lastPlayed.formatted())
+                🕐 Created: \(progress.createdAt.formatted())
 
-                    """)
+                """)
 
-                if progress.currentTaskIndex < tasks.count {
-                    let currentTask = tasks[progress.currentTaskIndex]
-                    print("🔮 Current Challenge: \(currentTask.title)")
-                    print("📜 Description: \(currentTask.description)")
-                } else {
-                    print(
-                        "🎉 All tasks completed! You are a master of the Terminal of the Ancients!")
-                }
+            if progress.currentTaskIndex < tasks.count {
+                let currentTask = tasks[progress.currentTaskIndex]
+                print("🔮 Current Challenge: \(currentTask.title)")
+                print("📜 Description: \(currentTask.description)")
             } else {
-                print("❌ No game progress found. Use --initiate to start a new game.")
+                print(
+                    "🎉 All tasks completed! You are a master of the Terminal of the Ancients!")
             }
         } catch {
             print("❌ Error loading game status: \(error)")
         }
     }
 
-    private func jumpToPuzzle(_ puzzleId: Int, modelContext: ModelContext) async throws {
+    private func jumpToPuzzle(_ puzzleId: Int, dataService: GameDataService) async throws {
         let tasks = Puzzle.allPuzzles
 
         guard puzzleId >= 0 && puzzleId < tasks.count else {
@@ -158,14 +144,7 @@ struct TerminalOfTheAncients: AsyncParsableCommand {
             return
         }
 
-        let descriptor = FetchDescriptor<PlayerProgress>()
-        let existingProgress = try modelContext.fetch(descriptor)
-        let progress = existingProgress.first ?? PlayerProgress()
-
-        // If this is a new progress object, insert it into the context
-        if existingProgress.isEmpty {
-            modelContext.insert(progress)
-        }
+        let progress = try await dataService.loadOrCreateProgress()
 
         // Complete all puzzles up to the target puzzle
         for i in 0..<puzzleId {
@@ -176,7 +155,7 @@ struct TerminalOfTheAncients: AsyncParsableCommand {
         progress.currentTaskIndex = puzzleId
         progress.lastPlayed = Date()
 
-        try modelContext.save()
+        try await dataService.saveProgress(progress)
 
         print("✅ Jumped to puzzle \(puzzleId): \(tasks[puzzleId].title)")
         print("🎮 You can now continue your journey by running the game without flags.")

@@ -68,10 +68,6 @@ The game now has 7 puzzles:
 1. Welcome Ritual
 2. **The Shell Script Ritual** (NEW)
 3. **Restore the Glyph Matrix** (NEW)
-4. The Sigil Compiler
-5. The File of Truth
-6. The JSON Codex
-7. The Vault Gate
 
 ## Tips for Development
 
