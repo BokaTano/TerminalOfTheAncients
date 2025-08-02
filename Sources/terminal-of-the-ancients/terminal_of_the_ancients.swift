@@ -42,28 +42,33 @@ struct TerminalOfTheAncients: AsyncParsableCommand {
             return
         }
 
-        // Create puzzle files if needed
-        await createPuzzleFiles()
-
         // Check if this is the first task (Welcome Ritual)
         let descriptor = FetchDescriptor<PlayerProgress>()
         let existingProgress = try modelContext.fetch(descriptor)
         let progress = existingProgress.first ?? PlayerProgress()
 
         if progress.currentTaskIndex == 0 && !initiate {
-            // Show temple entrance
-            ASCIIArt.showTempleEntrance()
-
             print(
                 """
 
                 ╔══════════════════════════════════════════════════════════════╗
-                ║                    TERMINAL OF THE ANCIENTS                  ║
+                ║                    🏛️  TERMINAL OF THE ANCIENTS  🏛️           ║
+                ║                                                              ║
+                ║                  ___            %.                           ║
+                ║           __  __/__/I__  ______% %%'                         ║
+                ║          / __/_[___]/_/I--.   /%%%%                          ║
+                ║         / /  I_/=/I__I/  /I  // )(                           ║
+                ║        / /____/=/ /_____//  //                               ║
+                ║       /  I___/=/ /_____I/  //                                ║
+                ║      /______/=/ /_________//                                 ║
+                ║      I_____/=/ /_________I/MJP                               ║
+                ║           /=/_/                                              ║
                 ║                                                              ║
                 ║  Welcome, digital archaeologist!                             ║
                 ║                                                              ║
-                ║  The ancient terminal awaits your command.                   ║
-                ║  A message appears on the screen...                          ║
+                ║  You stand before the ancient temple, its weathered          ║
+                ║  stones bearing the marks of countless centuries.            ║
+                ║  The ancient terminal awaits your command...                 ║
                 ║                                                              ║
                 ║  > "To begin your journey, you must first prove you          ║
                 ║  > understand the ancient CLI ways. Discover the             ║
@@ -142,41 +147,6 @@ struct TerminalOfTheAncients: AsyncParsableCommand {
             }
         } catch {
             print("❌ Error loading game status: \(error)")
-        }
-    }
-
-    private func createPuzzleFiles() async {
-        // Create secret_code.txt for Task 2
-        let secretCodeContent = """
-            Welcome to the ancient archives.
-
-            The secret code you seek is: ancient
-
-            This code will grant you access to the next chamber.
-            """
-
-        do {
-            try secretCodeContent.write(
-                toFile: "secret_code.txt", atomically: true, encoding: .utf8)
-        } catch {
-            // File might already exist, that's okay
-        }
-
-        // Create treasure.json for Task 3
-        let treasureJSON = """
-            {
-                "title": "Ancient Treasure",
-                "description": "A mysterious artifact from the lost civilization",
-                "key": "swiftdata",
-                "location": "Terminal of the Ancients",
-                "difficulty": "intermediate"
-            }
-            """
-
-        do {
-            try treasureJSON.write(toFile: "treasure.json", atomically: true, encoding: .utf8)
-        } catch {
-            // File might already exist, that's okay
         }
     }
 

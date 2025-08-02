@@ -31,6 +31,7 @@ struct LighthouseApp {
     }
 }
 
+
 // MARK: - Routes
 
 func routes(_ app: Application) throws {
@@ -40,49 +41,43 @@ func routes(_ app: Application) throws {
     }
 
     // Streaming endpoint
-    app.get("stream") { req async throws -> Response in
-        let response = Response()
-        response.headers.replaceOrAdd(name: "Content-Type", value: "text/event-stream")
-        response.headers.replaceOrAdd(name: "Cache-Control", value: "no-cache")
-        response.headers.replaceOrAdd(name: "Connection", value: "keep-alive")
-        response.headers.replaceOrAdd(name: "Access-Control-Allow-Origin", value: "*")
+    app.get("stream") { req -> Response in
+        var headers = HTTPHeaders()
+        headers.replaceOrAdd(name: .contentType, value: "text/event-stream")
+        headers.replaceOrAdd(name: .cacheControl, value: "no-cache")
+        headers.replaceOrAdd(name: .connection, value: "keep-alive")
+        headers.replaceOrAdd(name: "Access-Control-Allow-Origin", value: "*")
 
-        // Create streaming response
-        let stream = req.eventLoop.makePromise(of: Response.self)
-
-        Task {
+        let res = Response(status: .ok, headers: headers)
+        res.body = .init { writer in
             var waterLevel: Double = 2.0
             let startTime = Date()
-            var allData = ""
-
-            for i in 0..<10 {  // 10 events over 2 seconds
+            func sendEvent(i: Int) {
+                guard i < 10 else {
+                    writer.write(.init(string: "data: [DONE]\n\n")).whenComplete { _ in
+                        writer.close()
+                    }
+                    return
+                }
                 let event = TideEvent(
                     timestamp: startTime.addingTimeInterval(Double(i) * 0.2),
                     level: waterLevel,
                     type: waterLevel > 4.5 ? .high : .rising
                 )
-
-                let jsonData = try JSONEncoder().encode(event)
+                let jsonData = try! JSONEncoder().encode(event)
                 let jsonString = String(data: jsonData, encoding: .utf8) ?? ""
                 let sseData = "data: \(jsonString)\n\n"
-
-                // Accumulate all data
-                allData += sseData
-
-                // Increase water level (simulate rising tide)
                 waterLevel += 0.35 + Double.random(in: 0...0.1)
-
-                // Wait 200ms
-                try await Task.sleep(nanoseconds: 200_000_000)
+                writer.write(.init(string: sseData)).whenComplete { _ in
+                    writer.flush()
+                    usleep(200_000)  // 200ms
+                    sendEvent(i: i + 1)
+                }
             }
-
-            // End the stream
-            allData += "data: [DONE]\n\n"
-            response.body = .init(string: allData)
-            stream.succeed(response)
+            sendEvent(i: 0)
+            return ()
         }
-
-        return try await stream.futureResult.get()
+        return res
     }
 }
 
