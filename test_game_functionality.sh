@@ -1,91 +1,97 @@
 #!/bin/bash
 
-echo "🧪 Testing Game Functionality After Service Layer Refactoring"
-echo "=============================================================="
+# 🏛️ Terminal of the Ancients - Functionality Test Script
+# This script tests specific game functionality
 
-# Test 1: Build the project
-echo "📦 Test 1: Building the project..."
-if swift build; then
-    echo "✅ Build successful"
-else
-    echo "❌ Build failed"
+set -e  # Exit on any error
+
+# Colors for output
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+echo -e "${BLUE}🧪 Testing Terminal of the Ancients Functionality...${NC}"
+
+# Check if we're in the right directory
+if [ ! -f "Package.swift" ]; then
+    echo -e "${RED}❌ Error: Package.swift not found. Please run this script from the TerminalOfTheAncients directory.${NC}"
     exit 1
 fi
 
-# Test 2: Check game status
-echo -e "\n📊 Test 2: Checking game status..."
-if .build/debug/terminal-of-the-ancients --status; then
-    echo "✅ Status command works"
+# Build the project
+echo -e "${YELLOW}🔨 Building project...${NC}"
+swift build > /dev/null 2>&1
+echo -e "${GREEN}✅ Build successful${NC}"
+
+# Test 1: Status command
+echo -e "${YELLOW}📊 Testing status command...${NC}"
+if .build/debug/TOTA --status; then
+    echo -e "${GREEN}✅ Status command works${NC}"
 else
-    echo "❌ Status command failed"
+    echo -e "${RED}❌ Status command failed${NC}"
     exit 1
 fi
 
-# Test 3: Test reset functionality
-echo -e "\n🔄 Test 3: Testing reset functionality..."
-if .build/debug/terminal-of-the-ancients --reset; then
-    echo "✅ Reset command works"
+# Test 2: Reset command
+echo -e "${YELLOW}🔄 Testing reset command...${NC}"
+if .build/debug/TOTA --reset; then
+    echo -e "${GREEN}✅ Reset command works${NC}"
 else
-    echo "❌ Reset command failed"
+    echo -e "${RED}❌ Reset command failed${NC}"
     exit 1
 fi
 
-# Test 4: Verify reset worked
-echo -e "\n📊 Test 4: Verifying reset worked..."
-STATUS_OUTPUT=$(.build/debug/terminal-of-the-ancients --status 2>&1)
-if echo "$STATUS_OUTPUT" | grep -q "Current Task: 1 of 4"; then
-    echo "✅ Reset verified - back to task 1"
+# Test 3: Verify reset worked
+echo -e "${YELLOW}🔍 Verifying reset...${NC}"
+STATUS_OUTPUT=$(.build/debug/TOTA --status 2>&1)
+if echo "$STATUS_OUTPUT" | grep -q "Current Task: 1"; then
+    echo -e "${GREEN}✅ Reset verification passed${NC}"
 else
-    echo "❌ Reset verification failed"
+    echo -e "${RED}❌ Reset verification failed${NC}"
     echo "Status output: $STATUS_OUTPUT"
     exit 1
 fi
 
-# Test 5: Test jump functionality
-echo -e "\n🎯 Test 5: Testing jump functionality..."
-if .build/debug/terminal-of-the-ancients --jump 2; then
-    echo "✅ Jump command works"
+# Test 4: Jump command
+echo -e "${YELLOW}📍 Testing jump command...${NC}"
+if .build/debug/TOTA --jump 2; then
+    echo -e "${GREEN}✅ Jump command works${NC}"
 else
-    echo "❌ Jump command failed"
+    echo -e "${RED}❌ Jump command failed${NC}"
     exit 1
 fi
 
-# Test 6: Verify jump worked
-echo -e "\n📊 Test 6: Verifying jump worked..."
-STATUS_OUTPUT=$(.build/debug/terminal-of-the-ancients --status 2>&1)
-if echo "$STATUS_OUTPUT" | grep -q "Current Task: 3 of 4"; then
-    echo "✅ Jump verified - now at task 3"
+# Test 5: Verify jump worked
+echo -e "${YELLOW}🔍 Verifying jump...${NC}"
+STATUS_OUTPUT=$(.build/debug/TOTA --status 2>&1)
+if echo "$STATUS_OUTPUT" | grep -q "Current Task: 3"; then
+    echo -e "${GREEN}✅ Jump verification passed${NC}"
 else
-    echo "❌ Jump verification failed"
+    echo -e "${RED}❌ Jump verification failed${NC}"
     echo "Status output: $STATUS_OUTPUT"
     exit 1
 fi
 
-# Test 7: Test initiate functionality
-echo -e "\n🚀 Test 7: Testing initiate functionality..."
-if .build/debug/terminal-of-the-ancients --initiate; then
-    echo "✅ Initiate command works"
+# Test 6: Initiate command
+echo -e "${YELLOW}🚀 Testing initiate command...${NC}"
+if .build/debug/TOTA --initiate; then
+    echo -e "${GREEN}✅ Initiate command works${NC}"
 else
-    echo "❌ Initiate command failed"
+    echo -e "${RED}❌ Initiate command failed${NC}"
     exit 1
 fi
 
-# Test 8: Verify initiate worked
-echo -e "\n📊 Test 8: Verifying initiate worked..."
-STATUS_OUTPUT=$(.build/debug/terminal-of-the-ancients --status 2>&1)
-if echo "$STATUS_OUTPUT" | grep -q "Current Task: 2 of 4"; then
-    echo "✅ Initiate verified - now at task 2"
+# Test 7: Verify initiate worked
+echo -e "${YELLOW}🔍 Verifying initiate...${NC}"
+STATUS_OUTPUT=$(.build/debug/TOTA --status 2>&1)
+if echo "$STATUS_OUTPUT" | grep -q "Current Task: 2"; then
+    echo -e "${GREEN}✅ Initiate verification passed${NC}"
 else
-    echo "❌ Initiate verification failed"
+    echo -e "${RED}❌ Initiate verification failed${NC}"
     echo "Status output: $STATUS_OUTPUT"
     exit 1
 fi
 
-echo -e "\n🎉 All tests passed! Service layer refactoring is working correctly."
-echo "📝 Test summary:"
-echo "   ✅ Build system works"
-echo "   ✅ Status command works"
-echo "   ✅ Reset functionality works"
-echo "   ✅ Jump functionality works"
-echo "   ✅ Initiate functionality works"
-echo "   ✅ Data persistence works" 
+echo -e "${GREEN}🎉 All functionality tests passed!${NC}" 

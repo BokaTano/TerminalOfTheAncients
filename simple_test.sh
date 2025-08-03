@@ -1,35 +1,44 @@
 #!/bin/bash
 
-echo "🧪 Simple Service Layer Test"
-echo "============================"
+# 🏛️ Terminal of the Ancients - Simple Test Script
+# This script performs basic tests to ensure the game is working
 
-# Test 1: Build
-echo "📦 Building project..."
-swift build
-if [ $? -eq 0 ]; then
-    echo "✅ Build successful"
-else
-    echo "❌ Build failed"
+set -e  # Exit on any error
+
+# Colors for output
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+echo -e "${BLUE}🧪 Simple Test for Terminal of the Ancients...${NC}"
+
+# Check if we're in the right directory
+if [ ! -f "Package.swift" ]; then
+    echo -e "${RED}❌ Error: Package.swift not found. Please run this script from the TerminalOfTheAncients directory.${NC}"
     exit 1
 fi
 
-# Test 2: Check if executable exists
-echo "🔍 Checking executable..."
-if [ -f ".build/debug/terminal-of-the-ancients" ]; then
-    echo "✅ Executable exists"
+# Build the project
+echo -e "${YELLOW}🔨 Building project...${NC}"
+swift build > /dev/null 2>&1
+echo -e "${GREEN}✅ Build successful${NC}"
+
+# Check if executable exists
+if [ -f ".build/debug/TOTA" ]; then
+    echo -e "${GREEN}✅ Executable exists${NC}"
 else
-    echo "❌ Executable not found"
+    echo -e "${RED}❌ Executable not found${NC}"
     exit 1
 fi
 
-# Test 3: Test help
-echo "❓ Testing help command..."
-.build/debug/terminal-of-the-ancients --help > /dev/null 2>&1
-if [ $? -eq 0 ]; then
-    echo "✅ Help command works"
+# Test help command
+if .build/debug/TOTA --help > /dev/null 2>&1; then
+    echo -e "${GREEN}✅ Help command works${NC}"
 else
-    echo "❌ Help command failed"
+    echo -e "${RED}❌ Help command failed${NC}"
     exit 1
 fi
 
-echo "🎉 Basic tests passed! Service layer refactoring appears to be working." 
+echo -e "${GREEN}🎉 Simple test passed!${NC}" 

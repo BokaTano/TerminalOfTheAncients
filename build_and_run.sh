@@ -38,7 +38,7 @@ done
 
 # Run with arguments
 if [ $# -eq 0 ]; then
-    .build/debug/terminal-of-the-ancients
+    .build/debug/TOTA
 else
-    .build/debug/terminal-of-the-ancients "$@"
+    .build/debug/TOTA "$@"
 fi 

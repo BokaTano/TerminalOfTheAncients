@@ -30,14 +30,14 @@ swift build
 
 3. Run the game:
 ```bash
-.build/debug/terminal-of-the-ancients
+.build/debug/TOTA
 ```
 
 ## 🎯 How to Play
 
 ### Starting the Game
 
-- **New Game**: Run `./build/debug/terminal-of-the-ancients`
+- **New Game**: Run `./build/debug/TOTA`
 - **Reset Progress**: Use `--reset` flag
 - **Check Status**: Use `--status` flag
 - **Skip First Puzzle**: Use `--initiate` flag (for testing)
@@ -96,7 +96,7 @@ swift build
 swift test
 
 # Run the game
-.build/debug/terminal-of-the-ancients
+.build/debug/TOTA
 ```
 
 ## 🎨 Features

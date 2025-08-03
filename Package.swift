@@ -10,8 +10,8 @@ let package = Package(
     ],
     products: [
         .executable(
-            name: "terminal-of-the-ancients",
-            targets: ["terminal-of-the-ancients"]
+            name: "TOTA",
+            targets: ["TOTA"]
         )
     ],
     dependencies: [
@@ -22,7 +22,7 @@ let package = Package(
     ],
     targets: [
         .executableTarget(
-            name: "terminal-of-the-ancients",
+            name: "TOTA",
             dependencies: [
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
                 .product(name: "Rainbow", package: "Rainbow"),

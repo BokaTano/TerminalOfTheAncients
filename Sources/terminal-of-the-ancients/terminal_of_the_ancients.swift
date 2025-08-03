@@ -4,6 +4,7 @@ import Foundation
 @main
 struct TerminalOfTheAncients: AsyncParsableCommand {
     static let configuration = CommandConfiguration(
+        commandName: "tota",
         abstract: "Terminal of the Ancients - An interactive CLI adventure game",
         version: "1.0.0"
     )

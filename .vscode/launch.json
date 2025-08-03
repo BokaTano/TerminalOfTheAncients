@@ -1,40 +1,27 @@
 {
+    "version": "0.2.0",
     "configurations": [
         {
-            "type": "swift",
+            "type": "lldb",
             "request": "launch",
+            "name": "Debug TOTA",
+            "program": "${workspaceFolder:TerminalOfTheAncients}/.build/debug/TOTA",
+            "preLaunchTask": "swift: Build Debug TOTA",
             "args": [],
             "cwd": "${workspaceFolder:TerminalOfTheAncients}",
-            "name": "Debug terminal-of-the-ancients",
-            "program": "${workspaceFolder:TerminalOfTheAncients}/.build/debug/terminal-of-the-ancients",
-            "preLaunchTask": "swift: Build Debug terminal-of-the-ancients"
+            "env": {},
+            "console": "integratedTerminal"
         },
         {
-            "type": "swift",
+            "type": "lldb",
             "request": "launch",
+            "name": "Release TOTA",
+            "program": "${workspaceFolder:TerminalOfTheAncients}/.build/release/TOTA",
+            "preLaunchTask": "swift: Build Release TOTA",
             "args": [],
             "cwd": "${workspaceFolder:TerminalOfTheAncients}",
-            "name": "Release terminal-of-the-ancients",
-            "program": "${workspaceFolder:TerminalOfTheAncients}/.build/release/terminal-of-the-ancients",
-            "preLaunchTask": "swift: Build Release terminal-of-the-ancients"
-        },
-        {
-            "type": "swift",
-            "request": "launch",
-            "args": [],
-            "cwd": "${workspaceFolder:TerminalOfTheAncients}",
-            "name": "Debug render-glyphs",
-            "program": "${workspaceFolder:TerminalOfTheAncients}/.build/debug/render-glyphs",
-            "preLaunchTask": "swift: Build Debug render-glyphs"
-        },
-        {
-            "type": "swift",
-            "request": "launch",
-            "args": [],
-            "cwd": "${workspaceFolder:TerminalOfTheAncients}",
-            "name": "Release render-glyphs",
-            "program": "${workspaceFolder:TerminalOfTheAncients}/.build/release/render-glyphs",
-            "preLaunchTask": "swift: Build Release render-glyphs"
+            "env": {},
+            "console": "integratedTerminal"
         }
     ]
 }
