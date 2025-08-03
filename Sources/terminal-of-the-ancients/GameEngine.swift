@@ -3,12 +3,12 @@ import Foundation
 import ShellOut
 
 class GameEngine {
-    private let tasks: [Puzzle]
+    private let tasks: [any Puzzle]
     private let dataService: GameDataService
 
     init(dataService: GameDataService) {
         self.dataService = dataService
-        self.tasks = Puzzle.allPuzzles
+        self.tasks = WelcomeRitualPuzzle.allPuzzles
     }
 
     func startGame() async throws {
@@ -43,15 +43,15 @@ class GameEngine {
         print("🧩 \(puzzle.title)")
         print("📝 \(puzzle.description)")
 
-        // Special setup for Glyph Matrix puzzle
-        if puzzle.id == 2 {
-            do {
+        do {
+            if puzzle is GlyphMatrixPuzzle {
                 try await dataService.seedGlyphMatrix()
-                print("🗼 Glyphs have been seeded in SwiftData.")
-            } catch {
-                print("❌ Failed to seed glyph matrix: \(error)")
-                return false
+            } else {
+                try await puzzle.setup()
             }
+        } catch {
+            print("❌ Puzzle setup failed: \(error)")
+            return false
         }
 
         print()
@@ -79,21 +79,8 @@ class GameEngine {
                 continue
 
             default:
-                // Call appropriate validator based on task ID
-                var isValid = false
-
-                switch puzzle.id {
-                case 0:
-                    isValid = validateWelcomeRitual(input: input)
-                case 1:
-                    isValid = validateShellScriptRitual(input: input)
-                case 2:
-                    isValid = await validateGlyphMatrix(input: input)
-                case 3:
-                    isValid = await validateBeaconPuzzle(input: input)
-                default:
-                    isValid = false
-                }
+                // Use the puzzle's validate method
+                let isValid = await puzzle.validate(input: input)
 
                 if isValid {
                     print("✅ Correct! The ancient terminal accepts your answer.")
@@ -112,58 +99,6 @@ class GameEngine {
                     print()
                 }
             }
-        }
-    }
-
-    // MARK: - Puzzle Validators
-
-    private func validateWelcomeRitual(input: String) -> Bool {
-        // This is handled by the main program logic for --initiate flag
-        return false
-    }
-
-    private func validateShellScriptRitual(input: String) -> Bool {
-        do {
-            // First, try to run the build script to ensure it exists and works
-            _ = try shellOut(to: "chmod +x build_and_run.sh && ./build_and_run.sh --status")
-
-            // Check if the input is the expected answer
-            return input.lowercased() == "automation"
-        } catch {
-            print("❌ Shell script execution failed: \(error)")
-            return false
-        }
-    }
-
-    private func validateGlyphMatrix(input: String) async -> Bool {
-        // Validate the binary path
-        let fileManager = FileManager.default
-        guard fileManager.fileExists(atPath: input) else {
-            print("❌ Binary not found at path: \(input)")
-            print("💡 Make sure the path is correct and the file exists.")
-            return false
-        }
-
-        // Try to run the script
-        do {
-            return try await validateGlyphMatrixScript(binaryPath: input)
-        } catch {
-            print("❌ Failed to run script: \(error)")
-            print("💡 Make sure the script is compiled and executable.")
-            return false
-        }
-    }
-
-    private func validateBeaconPuzzle(input: String) async -> Bool {
-        let beaconTask = BeaconPuzzleTask()
-
-        do {
-            try await beaconTask.runPuzzle()
-            return true
-        } catch {
-            print("❌ Beacon analysis failed: \(error)")
-            print("💡 Try again or type 'hint' for guidance.")
-            return false
         }
     }
 

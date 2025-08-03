@@ -6,7 +6,7 @@ print("This test simulates the visualization from the 'Voice of the Lighthouse' 
 print("It should show a single, clean plot that updates in place...")
 print()
 
-// Simulate the visualization logic from BeaconPuzzleTask
+// Simulate the visualization logic from BeaconPuzzle
 var waterLevelHistory: [Double] = []
 var lastVisualizationLines = 0
 

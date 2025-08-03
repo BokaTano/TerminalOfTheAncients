@@ -110,7 +110,7 @@ struct TerminalOfTheAncients: AsyncParsableCommand {
     private func showStatus(dataService: GameDataService) async {
         do {
             let progress = try await dataService.loadOrCreateProgress()
-            let tasks = Puzzle.allPuzzles
+            let tasks = WelcomeRitualPuzzle.allPuzzles
             print(
                 """
 
@@ -137,7 +137,7 @@ struct TerminalOfTheAncients: AsyncParsableCommand {
     }
 
     private func jumpToPuzzle(_ puzzleId: Int, dataService: GameDataService) async throws {
-        let tasks = Puzzle.allPuzzles
+        let tasks = WelcomeRitualPuzzle.allPuzzles
 
         guard puzzleId >= 0 && puzzleId < tasks.count else {
             print("❌ Invalid puzzle ID. Available puzzles: 0-\(tasks.count - 1)")
