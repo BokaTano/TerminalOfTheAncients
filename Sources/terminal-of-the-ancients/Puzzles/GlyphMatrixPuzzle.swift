@@ -7,7 +7,6 @@ struct GlyphMatrixPuzzle: Puzzle {
     let description =
         "The lighthouse beacon has gone dark. Write a Swift script that reads glyphs from SwiftData and reconstructs the ASCII art."
     let hint = "Use the provided render_glyphs.swift tool. Run it with: ./run_render_glyphs.sh"
-    let solution = "glyph_matrix"
 
     func validate(input: String) async -> Bool {
         // Validate the binary path

@@ -8,7 +8,6 @@ struct BeaconPuzzle: Puzzle {
         "The lighthouse has awakened and now sends continuous tidal data through the air. The water is rising. You're standing deep in a coastal cave—and something is whispering..."
     let hint =
         "The beacon streams data that you must analyze. Connect to the server and extract the critical water level."
-    let solution = "beacon_analysis"
 
     func validate(input: String) async -> Bool {
         do {

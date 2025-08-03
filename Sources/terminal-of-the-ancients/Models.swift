@@ -6,7 +6,6 @@ protocol Puzzle {
     var title: String { get }
     var description: String { get }
     var hint: String { get }
-    var solution: String { get }
     func validate(input: String) async -> Bool
     func setup() async throws
     func displaySuccess() async

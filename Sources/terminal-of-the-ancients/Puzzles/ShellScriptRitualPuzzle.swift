@@ -5,13 +5,20 @@ struct ShellScriptRitualPuzzle: Puzzle {
     let id = 1
     let title = "The Shell Script Ritual"
     let description =
-        "The ancient terminal displays a message:\n> \"The ancients automated their workflows with shell scripts.\n> Execute the sacred build script to prove your mastery.\"\n\nYou must run the build_and_run.sh script and provide the word 'automation' to prove you understand shell scripting."
-    let hint = "Run the build script and then type 'automation' as your answer."
-    let solution = "automation"
+        "The ancient terminal displays a message:\n> \"The ancients automated their workflows with shell scripts.\n> Execute the sacred build script to prove your mastery.\"\n\nRun the build_and_run.sh script with swift. But then enter `start` to try to run it."
+    let hint =
+        "Run the build script and look for the word that represents the ancient practice of automating tasks."
 
     func validate(input: String) async -> Bool {
-        // Simply check if the user entered the correct answer
-        return input.lowercased() == "automation"
+        do {
+            // Run the build script and capture its output
+            // print something that shows the user is running the script
+            print("🔨 Running build script...")
+            try shellOut(to: "./build_and_run.sh")
+            return true
+        } catch {
+            return false
+        }
     }
 
     func displaySuccess() async {

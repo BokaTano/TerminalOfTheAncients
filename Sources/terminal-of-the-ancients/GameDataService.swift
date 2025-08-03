@@ -112,7 +112,13 @@ class GameDataService {
         // Verify the glyphs were saved
         let glyphDescriptor = FetchDescriptor<Glyph>()
         let savedGlyphs = try modelContext.fetch(glyphDescriptor)
-        print("🗼 Seeded \(glyphCount) glyphs in the store, verified \(savedGlyphs.count) saved")
+        if savedGlyphs.count != glyphCount {
+            throw NSError(
+                domain: "GameDataService",
+                code: 1,
+                userInfo: [NSLocalizedDescriptionKey: "Glyph count mismatch"]
+            )
+        }
     }
 
     func getGlyphs() async throws -> [Glyph] {
