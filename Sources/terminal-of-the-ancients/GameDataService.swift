@@ -59,6 +59,17 @@ class GameDataService {
         try modelContext.save()
     }
 
+    func advanceToNextPuzzle() async throws {
+        let progress = try await loadOrCreateProgress()
+        
+        // Complete current puzzle and advance to next
+        progress.completedTasks.insert(progress.currentTaskIndex)
+        progress.currentTaskIndex += 1
+        progress.lastPlayed = Date()
+        
+        try await saveProgress(progress)
+    }
+
     // MARK: - Glyph Management
     func seedGlyphMatrix() async throws {
         // Clear existing glyphs
