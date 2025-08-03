@@ -62,9 +62,6 @@ struct BeaconPuzzle: Puzzle {
         print("The water level is now \(String(format: "%.2f", criticalLevel)) m.")
         print("You must leave the cave immediately!")
         print()
-
-        // Success animation
-        await displaySuccessAnimation()
     }
 
     // MARK: - Server Management
@@ -165,17 +162,14 @@ struct BeaconPuzzle: Puzzle {
         fflush(stdout)  // Force output
     }
 
-    // MARK: - Success Animation
+    func displaySuccess() async {
+        print("✅ Beacon Puzzle completed! The ancient lighthouse has saved your life.")
 
-    private func displaySuccessAnimation() async {
+        // Show the emergency alert animation
         let animation = """
             ╔══════════════════════════════════════════════════════════════╗
             ║                    🚨 EMERGENCY ALERT 🚨                      ║
             ║                                                              ║
-            ║  ████████████████████████████████████████████████████████  ║
-            ║  ████████████████████████████████████████████████████████  ║
-            ║  ████████████████████████████████████████████████████████  ║
-            ║  ████████████████████████████████████████████████████████  ║
             ║                                                              ║
             ║  The lighthouse has revealed the truth!                     ║
             ║  The rising tide threatens to flood the cave.               ║
@@ -193,5 +187,10 @@ struct BeaconPuzzle: Puzzle {
             print("🚨 EVACUATE! 🚨")
             try? await Task.sleep(nanoseconds: 500_000_000)
         }
+    }
+
+    func displayError() async {
+        print("❌ The beacon's signal is unclear. The ancient lighthouse cannot guide you.")
+        print("💡 Try again or type 'hint' for guidance.")
     }
 }

@@ -10,15 +10,16 @@ struct ShellScriptRitualPuzzle: Puzzle {
     let solution = "automation"
 
     func validate(input: String) async -> Bool {
-        do {
-            // First, try to run the build script to ensure it exists and works
-            _ = try shellOut(to: "chmod +x build_and_run.sh && ./build_and_run.sh --status")
+        // Simply check if the user entered the correct answer
+        return input.lowercased() == "automation"
+    }
 
-            // Check if the input is the expected answer
-            return input.lowercased() == "automation"
-        } catch {
-            print("❌ Shell script execution failed: \(error)")
-            return false
-        }
+    func displaySuccess() async {
+        print("✅ Shell Script Ritual completed! You have mastered the ancient art of automation.")
+    }
+
+    func displayError() async {
+        print("❌ The ancient automation chamber rejects your offering.")
+        print("💡 Try again or type 'hint' for guidance.")
     }
 }

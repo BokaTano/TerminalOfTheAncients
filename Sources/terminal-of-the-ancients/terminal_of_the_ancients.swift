@@ -43,12 +43,9 @@ struct TerminalOfTheAncients: AsyncParsableCommand {
         if initiate {
             try await dataService.advanceToNextPuzzle()
 
-            print(
-                "✅ Welcome Ritual completed! You have proven your knowledge of CLI argument parsing."
-            )
-            print("🔓 Access granted to the next chamber...")
-            print()
-            print("🎮 You can now continue your journey by running the game without flags.")
+            let welcomePuzzle = WelcomeRitualPuzzle()
+            await welcomePuzzle.displaySuccess()
+
             return
         }
 
@@ -127,15 +124,12 @@ struct TerminalOfTheAncients: AsyncParsableCommand {
                 let isValid = await puzzle.validate(input: input)
 
                 if isValid {
-                    print("✅ Correct! The ancient terminal accepts your answer.")
-                    print("🔓 Access granted to the next chamber...")
-                    print()
+                    await puzzle.displaySuccess()
 
                     try? await dataService.advanceToNextPuzzle()
                     return true
                 } else {
-                    print("❌ Incorrect. The ancient terminal rejects your answer.")
-                    print("💡 Try again or type 'hint' for guidance.")
+                    await puzzle.displayError()
                     print()
                 }
             }

@@ -68,4 +68,13 @@ struct GlyphMatrixPuzzle: Puzzle {
         // This will be handled by GameEngine with dataService.seedGlyphMatrix()
         // We don't implement it here since it needs access to dataService
     }
+
+    func displaySuccess() async {
+        print("✅ Glyph Matrix restored! The ancient lighthouse emerges from the digital depths.")
+    }
+
+    func displayError() async {
+        print("❌ The glyph matrix remains fragmented. The lighthouse beacon stays dark.")
+        print("💡 Try again or type 'hint' for guidance.")
+    }
 }

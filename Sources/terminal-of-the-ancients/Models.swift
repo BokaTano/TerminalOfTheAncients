@@ -7,9 +7,10 @@ protocol Puzzle {
     var description: String { get }
     var hint: String { get }
     var solution: String { get }
-    var successMessage: String { get }
     func validate(input: String) async -> Bool
     func setup() async throws
+    func displaySuccess() async
+    func displayError() async
 }
 
 extension Puzzle {
