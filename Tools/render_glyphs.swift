@@ -3,30 +3,7 @@
 import Foundation
 import SwiftData
 
-// MARK: - Minimal argument parsing
-
-struct Args {
-    var store: String = ""
-}
-
-func parseArgs() -> Args {
-    var args = Args()
-    var it = CommandLine.arguments.dropFirst().makeIterator()
-    while let a = it.next() {
-        switch a {
-        case "--store":
-            args.store = it.next() ?? ""
-        default:
-            break
-        }
-    }
-    return args
-}
-
-let args = parseArgs()
-
-// MARK: - SwiftData Logic and Models (same as GameDataService)
-
+// MARK: - SwiftData Models
 @Model
 final class PlayerProgress {
     var currentTaskIndex: Int
@@ -55,60 +32,59 @@ final class Glyph {
     }
 }
 
-func createModelContainer(storePath: String?) throws -> ModelContainer {
-    if let storePath = storePath, !storePath.isEmpty {
-        // Use specified store path
-        let storeURL = URL(fileURLWithPath: storePath)
-        let config = ModelConfiguration(url: storeURL)
-        return try ModelContainer(for: PlayerProgress.self, Glyph.self, configurations: config)
-    } else {
-        // Use default store
-        return try ModelContainer(for: PlayerProgress.self, Glyph.self)
-    }
-}
+func getSortedGlyphs() throws -> [Glyph] {
+    let container = try ModelContainer(for: PlayerProgress.self, Glyph.self)
+    let context = ModelContext(container)
 
-func getSortedGlyphs(context: ModelContext) throws -> [Glyph] {
-    let descriptor = FetchDescriptor<Glyph>(sortBy: [
-        .init(\.y, order: .forward),
-        .init(\.x, order: .forward),
-    ])
+    // Sort glyphs: first by row (y), then by column (x) within each row
+    let sortByRow = SortDescriptor<Glyph>(\.y, order: .forward)
+    let sortByColumn = SortDescriptor<Glyph>(\.x, order: .forward)
+    let descriptor = FetchDescriptor<Glyph>(sortBy: [sortByRow, sortByColumn])
     return try context.fetch(descriptor)
 }
 
 // MARK: - Main Execution
 
-// Create container and context using same logic as GameDataService
-let container = try createModelContainer(storePath: args.store.isEmpty ? nil : args.store)
-let context = ModelContext(container)
+// Get sorted glyphs
+let glyphs = try getSortedGlyphs()
 
-// Get sorted glyphs using same logic as GameDataService
-let glyphs = try getSortedGlyphs(context: context)
+// Find the grid boundaries by getting the maximum x and y coordinates
+let allXCoordinates = glyphs.map(\.x)
+let allYCoordinates = glyphs.map(\.y)
 
-guard let maxX = glyphs.map(\.x).max(),
-    let maxY = glyphs.map(\.y).max()
+guard let maxX = allXCoordinates.max(),
+    let maxY = allYCoordinates.max()
 else {
     fputs("No glyphs found in store.\n", stderr)
     exit(1)
 }
 
-// Fill grid with spaces
-var grid = Array(
-    repeating: Array(repeating: " ", count: maxX + 1),
-    count: maxY + 1
-)
+// Create a grid filled with spaces
+// Grid size: (maxX + 1) columns × (maxY + 1) rows
+let gridWidth = maxX + 1
+let gridHeight = maxY + 1
+var grid = Array(repeating: Array(repeating: " ", count: gridWidth), count: gridHeight)
 
-// Place symbols
+// Place symbols in grid
 for g in glyphs {
-    grid[g.y][g.x] = g.symbol.isEmpty ? " " : String(g.symbol.prefix(1))
+    grid[g.y][g.x] = g.symbol
 }
 
-// Join into ASCII and trim only trailing spaces from each line (keep leading spaces)
-let ascii = grid.map { line in
-    let joined = line.joined()
-    // Only trim trailing spaces, keep leading spaces
-    return joined.replacingOccurrences(of: #" +$"#, with: "", options: .regularExpression)
-}.joined(separator: "\n")
+// Convert grid to ASCII art
+// Step 1: Convert each row to a string and clean up trailing spaces
+let asciiRows = grid.map { row in
+    let rowString = row.joined()  // Join all characters in the row
+    // Remove trailing spaces but keep leading spaces (for proper alignment)
+    let cleanedRow = rowString.replacingOccurrences(
+        of: #" +$"#, with: "", options: .regularExpression)
+    return cleanedRow
+}
 
-// For now, output plain ASCII (colors can be added later as enhancement)
-// Only remove trailing newline, keep leading spaces
-print(ascii.replacingOccurrences(of: #"\n+$"#, with: "", options: .regularExpression))
+// Step 2: Join all rows with newlines
+let asciiArt = asciiRows.joined(separator: "\n")
+
+// Step 3: Remove any trailing newlines
+let finalOutput = asciiArt.replacingOccurrences(of: #"\n+$"#, with: "", options: .regularExpression)
+
+// Step 4:Print the final output
+print(finalOutput)

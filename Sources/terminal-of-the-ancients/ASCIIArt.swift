@@ -1,5 +1,4 @@
 import Foundation
-import Rainbow
 
 class ASCIIArt {
 
@@ -36,7 +35,7 @@ class ASCIIArt {
             """
 
         print("\u{1B}[2J\u{1B}[H")  // Clear screen
-        print(trapdoor.red.bold)
+        print(trapdoor)
 
         // Add dramatic pause
         try? await Task.sleep(for: .seconds(3))
@@ -79,7 +78,7 @@ class ASCIIArt {
         // Show the final chamber art
         let art = getChamberArt(taskId: taskId)
         print("\u{1B}[2J\u{1B}[H")  // Clear screen
-        print(art.green.bold)
+        print(art)
 
         // Add some dramatic pause
         try? await Task.sleep(for: .seconds(2))  // 2 seconds to appreciate the art

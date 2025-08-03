@@ -121,16 +121,17 @@ class GameDataService {
         }
     }
 
-    func getGlyphs() async throws -> [Glyph] {
-        let descriptor = FetchDescriptor<Glyph>()
-        return try modelContext.fetch(descriptor)
-    }
-
     func getSortedGlyphs() async throws -> [Glyph] {
         let descriptor = FetchDescriptor<Glyph>(sortBy: [
             .init(\.y, order: .forward),
             .init(\.x, order: .forward),
         ])
+        return try modelContext.fetch(descriptor)
+    }
+
+    // TODO: remove this once we do not need the tests anymore
+    func getGlyphs() async throws -> [Glyph] {
+        let descriptor = FetchDescriptor<Glyph>()
         return try modelContext.fetch(descriptor)
     }
 }
