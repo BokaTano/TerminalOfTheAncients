@@ -15,7 +15,9 @@ struct BeaconPuzzle: Puzzle {
             return true
         } catch {
             print("❌ Beacon analysis failed: \(error)")
-            print("💡 Try again or type 'hint' for guidance.")
+            print(
+                "💡 The lighthouse server may not be running. Try again or type 'hint' for guidance."
+            )
             return false
         }
     }
@@ -29,52 +31,33 @@ struct BeaconPuzzle: Puzzle {
     @MainActor
     private func runPuzzle() async throws {
         print()
-        print("📡 Connecting to beacon stream...")
+        print("💬 The beacon pulses...")
         print()
 
         // Start streaming with visualization
         let stream = streamTideData()
-        var eventCount = 0
 
-        print("💬 The beacon pulses...")
-
-        for try await event in stream {
-            eventCount += 1
-
+        for try await event: TideEvent in stream {
             // Display water level with progress bar
             displayWaterLevel(event.level)
 
-            // Add minimal pacing
+            // Add minimal pacing for the animation
             try await Task.sleep(nanoseconds: 20_000_000)  // 0.02 second
         }
 
-        print("📊 Received \(eventCount) events from server")
-
-        print()  // New line after progress bar
+        print()
         print("🔍 Analyzing tidal data...")
-
-        // Use a reasonable critical level
-        let criticalLevel = 5.5
-
         print()
-        print("⚠️  CRITICAL ALERT ⚠️")
-        print("The water level is now \(String(format: "%.2f", criticalLevel)) m.")
-        print("You must leave the cave immediately!")
-        print()
+        try await Task.sleep(nanoseconds: 1_000_000_000)  // 1 second
     }
 
     // MARK: - Server Management
 
     private func ensureServerRunning() async throws {
-        print("🌊 Checking lighthouse beacon status...")
-
         // First, try to connect to see if server is already running
         if await isServerRunning() {
-            print("✅ Lighthouse server is already running")
             return
         }
-
-        print("🚀 Starting lighthouse server...")
 
         // Start the lighthouse server using the script
         let process = Process()
@@ -87,15 +70,13 @@ struct BeaconPuzzle: Puzzle {
         process.standardError = pipe
 
         try process.run()
-        process.waitUntilExit()
 
-        // Wait a moment for server to start
+        // Don't wait for the script to exit since it runs the server in background
+        // Instead, wait a moment and then check if server is running
         try await Task.sleep(nanoseconds: 3_000_000_000)  // 3 seconds
 
         // Check if server is now running
-        if await isServerRunning() {
-            print("✅ Lighthouse server started successfully")
-        } else {
+        if await isServerRunning() == false {
             throw BeaconError.serverStartFailed
         }
     }
@@ -134,9 +115,6 @@ struct BeaconPuzzle: Puzzle {
                     request.setValue("text/event-stream", forHTTPHeaderField: "Accept")
                     request.setValue("no-cache", forHTTPHeaderField: "Cache-Control")
 
-                    print("🔗 Connecting to lighthouse stream...")
-                    print("✅ Stream connected, waiting for data...")
-
                     let (asyncBytes, response) = try await URLSession.shared.bytes(for: request)
 
                     guard let httpResponse = response as? HTTPURLResponse,
@@ -148,13 +126,11 @@ struct BeaconPuzzle: Puzzle {
                     }
 
                     // Parse Server-Sent Events
-                    var buffer = ""
                     for try await line in asyncBytes.lines {
                         if line.hasPrefix("data: ") {
                             let dataString = String(line.dropFirst(6))  // Remove "data: "
 
                             if dataString == "[DONE]" {
-                                print("🏁 Stream finished")
                                 continuation.finish()
                                 return
                             }
@@ -168,9 +144,7 @@ struct BeaconPuzzle: Puzzle {
                         }
                     }
 
-                    print("🏁 Stream finished")
                     continuation.finish()
-
                 } catch {
                     print("❌ Stream error: \(error)")
                     continuation.finish()
@@ -182,7 +156,9 @@ struct BeaconPuzzle: Puzzle {
     // MARK: - Display Functions
 
     private func displayWaterLevel(_ level: Double) {
-        let percentage = min(Int((level / 6.0) * 100), 100)
+        // Use a more realistic maximum water level for the progress bar
+        let maxLevel = 8.0  // 8 meters is a reasonable high tide level
+        let percentage = min(Int((level / maxLevel) * 100), 100)
         let barLength = 50
         let filledLength = Int((Double(percentage) / 100.0) * Double(barLength))
         let bar =
@@ -196,15 +172,15 @@ struct BeaconPuzzle: Puzzle {
     }
 
     func displaySuccess() async {
-        print("✅ Beacon Puzzle completed! The ancient lighthouse has saved your life.")
+        let criticalLevel = 5.5
 
-        // Show the emergency alert animation
-        let animation = """
+        let emergencyAlert = """
             ╔══════════════════════════════════════════════════════════════╗
             ║                    🚨 EMERGENCY ALERT 🚨                      ║
             ║                                                              ║
             ║                                                              ║
             ║  The lighthouse has revealed the truth!                     ║
+            ║  The water level is now \(String(format: "%.2f", criticalLevel)) m.                    ║
             ║  The rising tide threatens to flood the cave.               ║
             ║  You must evacuate immediately!                             ║
             ║                                                              ║
@@ -212,14 +188,18 @@ struct BeaconPuzzle: Puzzle {
             ╚══════════════════════════════════════════════════════════════╝
             """
 
-        print(animation)
+        print(emergencyAlert)
+        print()
+
+        try? await Task.sleep(nanoseconds: 3_000_000_000)
 
         // Pulsing effect
         for _ in 0..<3 {
-            try? await Task.sleep(nanoseconds: 500_000_000)
+            try? await Task.sleep(nanoseconds: 1_000_000_000)
             print("🚨 EVACUATE! 🚨")
-            try? await Task.sleep(nanoseconds: 500_000_000)
+            try? await Task.sleep(nanoseconds: 1_000_000_000)
         }
+        print()
     }
 
     func displayError() async {

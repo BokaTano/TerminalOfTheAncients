@@ -49,23 +49,24 @@ func routes(_ app: Application) throws {
 
         let res = Response(status: .ok, headers: headers)
 
-        // Create a simple streaming response
+        // Create a simple streaming response with realistic tide levels
         var responseBody = ""
-        var waterLevel: Double = 2.0
+        var waterLevel: Double = 1.5  // Start at low tide level
         let startTime = Date()
 
         for i in 0..<50 {
             let event = TideEvent(
                 timestamp: startTime.addingTimeInterval(Double(i) * 0.2),
                 level: waterLevel,
-                type: waterLevel > 4.5 ? .high : .rising
+                type: waterLevel > 4.0 ? .high : .rising
             )
 
             let jsonData = try! JSONEncoder().encode(event)
             let jsonString = String(data: jsonData, encoding: .utf8) ?? ""
             responseBody += "data: \(jsonString)\n\n"
 
-            waterLevel += 0.35 + Double.random(in: 0...0.1)
+            // More realistic tide progression: smaller increments
+            waterLevel += 0.08 + Double.random(in: 0...0.05)
         }
 
         responseBody += "data: [DONE]\n\n"
