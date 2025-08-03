@@ -1,5 +1,6 @@
 import CryptoKit
 import Foundation
+import ShellOut
 
 class GameEngine {
     private let tasks: [Puzzle]
@@ -24,7 +25,7 @@ class GameEngine {
                 print()
             }
 
-            let completed = await playTask(currentTask, progress: progress)
+            let completed = await playPuzzle(currentTask, progress: progress)
             if !completed {
                 return  // User quit the game
             }
@@ -37,22 +38,27 @@ class GameEngine {
         print("You are now a master of the Terminal of the Ancients!")
     }
 
-    private func playTask(_ task: Puzzle, progress: PlayerProgress) async -> Bool {
-        // Special handling for Glyph Matrix puzzle
-        if task.id == 2 {  // Glyph Matrix puzzle
-            return await playGlyphMatrixTask(task, progress: progress)
+    private func playPuzzle(_ puzzle: Puzzle, progress: PlayerProgress) async -> Bool {
+        // Show puzzle description
+        print("🧩 \(puzzle.title)")
+        print("📝 \(puzzle.description)")
+
+        // Special setup for Glyph Matrix puzzle
+        if puzzle.id == 2 {
+            do {
+                try await dataService.seedGlyphMatrix()
+                print("🗼 Glyphs have been seeded in SwiftData.")
+            } catch {
+                print("❌ Failed to seed glyph matrix: \(error)")
+                return false
+            }
         }
 
-        // Special handling for Beacon puzzle
-        if task.id == 3 {  // Beacon puzzle
-            return await playBeaconTask(task, progress: progress)
-        }
+        print()
 
         while true {
             print("💭 Enter your answer (or 'hint' for help, 'quit' to exit):")
             guard let input = readLine()?.trimmingCharacters(in: .whitespacesAndNewlines) else {
-                // If readLine returns nil, it might be EOF or no input available
-                // In a real CLI scenario, this would be unusual, so we'll break
                 print("❌ No input available. Exiting...")
                 return false
             }
@@ -63,7 +69,7 @@ class GameEngine {
                 return false
 
             case "hint":
-                print("💡 Hint: \(task.hint)")
+                print("💡 Hint: \(puzzle.hint)")
                 print()
                 continue
 
@@ -73,33 +79,32 @@ class GameEngine {
                 continue
 
             default:
-                if task.validator(input) {
+                // Call appropriate validator based on task ID
+                var isValid = false
+
+                switch puzzle.id {
+                case 0:
+                    isValid = validateWelcomeRitual(input: input)
+                case 1:
+                    isValid = validateShellScriptRitual(input: input)
+                case 2:
+                    isValid = await validateGlyphMatrix(input: input)
+                case 3:
+                    isValid = await validateBeaconPuzzle(input: input)
+                default:
+                    isValid = false
+                }
+
+                if isValid {
                     print("✅ Correct! The ancient terminal accepts your answer.")
                     print("🔓 Access granted to the next chamber...")
                     print()
 
-                    // Show ASCII art for puzzle completion
-                    await ASCIIArt.showChamberUnlocked(taskId: task.id)
-
-                    // Wait for user to press Enter to continue
-                    print("Press Enter to continue your journey...")
-                    _ = readLine()
-
-                    progress.completedTasks.insert(task.id)
+                    progress.completedTasks.insert(puzzle.id)
                     progress.currentTaskIndex += 1
                     progress.lastPlayed = Date()
 
                     try? await dataService.saveProgress(progress)
-
-                    // Check if we're moving to task 3 and show trapdoor scene
-                    if progress.currentTaskIndex == 3 {  // After completing task 2 (Glyph Matrix)
-                        print(
-                            "\n🚪 As you step forward, the floor beneath you suddenly gives way...")
-                        await ASCIIArt.showTrapdoorScene()
-                        print("\n🎮 Continue your journey in the hidden chamber below...")
-                    }
-
-                    // Task completed, return to main loop
                     return true
                 } else {
                     print("❌ Incorrect. The ancient terminal rejects your answer.")
@@ -110,152 +115,54 @@ class GameEngine {
         }
     }
 
-    private func playGlyphMatrixTask(_ task: Puzzle, progress: PlayerProgress) async -> Bool {
-        // Seed the glyph matrix first
+    // MARK: - Puzzle Validators
+
+    private func validateWelcomeRitual(input: String) -> Bool {
+        // This is handled by the main program logic for --initiate flag
+        return false
+    }
+
+    private func validateShellScriptRitual(input: String) -> Bool {
         do {
-            try await dataService.seedGlyphMatrix()
+            // First, try to run the build script to ensure it exists and works
+            _ = try shellOut(to: "chmod +x build_and_run.sh && ./build_and_run.sh --status")
+
+            // Check if the input is the expected answer
+            return input.lowercased() == "automation"
         } catch {
-            print("❌ Failed to seed glyph matrix: \(error)")
+            print("❌ Shell script execution failed: \(error)")
             return false
-        }
-
-        print("🗼 The lighthouse beacon has gone dark. Glyphs have been seeded in SwiftData.")
-        print("💡 Use render_glyphs.swift to reconstruct the ASCII art.")
-        print()
-
-        // Show what the lighthouse should look like
-        print("🎯 This is what your script should output:")
-        print(String(repeating: "─", count: 60))
-        let red = "\u{001B}[31m"
-        let gray = "\u{001B}[90m"
-        let reset = "\u{001B}[0m"
-
-        let lighthouseASCII =
-            "\(gray)        |\n        |\n       /_\\\n       |\(red)#\(gray)|\n       |\(red)#\(gray)|\n      /\(red)###\(gray)\\\n      |\(red)###\(gray)|\n------|\(red)###\(gray)|------\n      |\(red)###\(gray)|\n      |\(red)###\(gray)|\n      '---'\n  \(reset)EIERLAND LIGHTHOUSE\n   53.179N 4.855E"
-        print(lighthouseASCII)
-        print(String(repeating: "─", count: 60))
-        print()
-
-        while true {
-            print(
-                "💭 Enter the path to your compiled Swift binary (or 'hint' for help, 'quit' to exit):"
-            )
-            guard let input = readLine()?.trimmingCharacters(in: .whitespacesAndNewlines) else {
-                print("❌ No input available. Exiting...")
-                return false
-            }
-
-            switch input.lowercased() {
-            case "quit", "exit":
-                print("👋 Farewell, digital archaeologist. Your progress has been saved.")
-                return false
-
-            case "hint":
-                print("💡 Hint: \(task.hint)")
-                print("📁 The script should be compiled and executable.")
-                print("🔧 Example: swiftc render_glyphs.swift -o render_glyphs")
-                print()
-                continue
-
-            case "xyzzy":
-                print("🌟 Nothing happens... or does it? You've discovered an ancient easter egg!")
-                print()
-                continue
-
-            default:
-                // Validate the binary path
-                let fileManager = FileManager.default
-                guard fileManager.fileExists(atPath: input) else {
-                    print("❌ Binary not found at path: \(input)")
-                    print("💡 Make sure the path is correct and the file exists.")
-                    print()
-                    continue
-                }
-
-                // Try to run the script
-                do {
-                    let isValid = try await validateGlyphMatrixScript(binaryPath: input)
-
-                    if isValid {
-                        print("✅ The beacon shines again. Its coordinates are 53.179N 4.855E.")
-                        print("🔓 In the next puzzle, you will need these numbers...")
-                        print()
-
-                        // Show ASCII art for puzzle completion
-                        await ASCIIArt.showChamberUnlocked(taskId: task.id)
-
-                        // Wait for user to press Enter to continue
-                        print("Press Enter to continue your journey...")
-                        _ = readLine()
-
-                        progress.completedTasks.insert(task.id)
-                        progress.currentTaskIndex += 1
-                        progress.lastPlayed = Date()
-
-                        try? await dataService.saveProgress(progress)
-
-                        // Check if we're moving to task 3 (Sigil Compiler) and show trapdoor scene
-                        if progress.currentTaskIndex == 3 {  // After completing task 2 (Glyph Matrix)
-                            print(
-                                "\n🚪 As you step forward, the floor beneath you suddenly gives way..."
-                            )
-                            await ASCIIArt.showTrapdoorScene()
-                            print("\n🎮 Continue your journey in the hidden chamber below...")
-                        }
-
-                        return true
-                    } else {
-                        print(
-                            "❌ The matrix is malformed. Perhaps you have a missing glyph? Or the spacing is off?"
-                        )
-                        print("💡 Try again.")
-                        print()
-                    }
-                } catch {
-                    print("❌ Failed to run script: \(error)")
-                    print("💡 Make sure the script is compiled and executable.")
-                    print()
-                }
-            }
         }
     }
 
-    // MARK: - Beacon Puzzle
+    private func validateGlyphMatrix(input: String) async -> Bool {
+        // Validate the binary path
+        let fileManager = FileManager.default
+        guard fileManager.fileExists(atPath: input) else {
+            print("❌ Binary not found at path: \(input)")
+            print("💡 Make sure the path is correct and the file exists.")
+            return false
+        }
 
-    private func playBeaconTask(_ task: Puzzle, progress: PlayerProgress) async -> Bool {
-        print("🗼 The lighthouse has awakened. It now sends continuous tidal data through the air.")
-        print(
-            "🌊 The water is rising. You're standing deep in a coastal cave—and something is whispering..."
-        )
-        print()
+        // Try to run the script
+        do {
+            return try await validateGlyphMatrixScript(binaryPath: input)
+        } catch {
+            print("❌ Failed to run script: \(error)")
+            print("💡 Make sure the script is compiled and executable.")
+            return false
+        }
+    }
 
+    private func validateBeaconPuzzle(input: String) async -> Bool {
         let beaconTask = BeaconPuzzleTask()
 
         do {
             try await beaconTask.runPuzzle()
-
-            print("✅ The beacon analysis is complete!")
-            print("🔓 Access granted to the next chamber...")
-            print()
-
-            // Show ASCII art for puzzle completion
-            await ASCIIArt.showChamberUnlocked(taskId: task.id)
-
-            // Wait for user to press Enter to continue
-            print("Press Enter to continue your journey...")
-            _ = readLine()
-
-            progress.completedTasks.insert(task.id)
-            progress.currentTaskIndex += 1
-            progress.lastPlayed = Date()
-
-            try? await dataService.saveProgress(progress)
-
             return true
         } catch {
             print("❌ Beacon analysis failed: \(error)")
             print("💡 Try again or type 'hint' for guidance.")
-            print()
             return false
         }
     }
@@ -301,26 +208,4 @@ class GameEngine {
 
         return outputHash == expectedHash
     }
-
-    private func printBanner() {
-        print(
-            """
-
-            ╔══════════════════════════════════════════════════════════════╗
-            ║                    TERMINAL OF THE ANCIENTS                  ║
-            ║                                                              ║
-            ║  You are a digital archaeologist on the island of Texel.    ║
-            ║  Hidden beneath the dunes, you discover an ancient CLI      ║
-            ║  terminal — a remnant of a lost civilization of Swift       ║
-            ║  developers. To unlock the secrets of their knowledge,      ║
-            ║  you must complete puzzles encoded in Swift code.           ║
-            ║                                                              ║
-            ║  Each puzzle grants you access to the next part of the      ║
-            ║  story. Your progress is saved locally so you can return    ║
-            ║  later and continue where you left off.                     ║
-            ╚══════════════════════════════════════════════════════════════╝
-
-            """)
-    }
-
 }
