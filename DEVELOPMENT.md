@@ -19,6 +19,19 @@ Instead of manually running `swift build` and then the executable, use the conve
 ./build_and_run.sh --help
 ```
 
+### Lighthouse Server
+
+The BeaconPuzzle requires a local lighthouse server to be running on port 8080. The game will automatically start this server when needed, but you can also start it manually:
+
+```bash
+# Start the lighthouse server manually
+./start_lighthouse.sh
+
+# The server provides:
+# - Health check: http://localhost:8080/health
+# - Tide data stream: http://localhost:8080/stream
+```
+
 ### Benefits
 
 - **One Command**: Build and run in a single command

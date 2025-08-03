@@ -23,13 +23,25 @@ git clone <repository-url>
 cd TerminalOfTheAncients
 ```
 
-2. Build the project:
+2. Build and run the game:
 ```bash
-swift build
+./build_and_run.sh
 ```
 
-3. Run the game:
+The game will automatically start the required lighthouse server for the BeaconPuzzle.
+
+### Alternative: Manual Setup
+
+If you prefer to build manually:
+
 ```bash
+# Build the project
+swift build
+
+# Start the lighthouse server (required for BeaconPuzzle)
+./start_lighthouse.sh
+
+# Run the game
 .build/debug/TOTA
 ```
 

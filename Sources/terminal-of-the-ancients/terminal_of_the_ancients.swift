@@ -127,6 +127,7 @@ struct TerminalOfTheAncients: AsyncParsableCommand {
                 if isValid {
                     await puzzle.displaySuccess()
                     print()
+                    print("--------------------------------")
                     print()
 
                     try? await dataService.advanceToNextPuzzle()

@@ -31,7 +31,6 @@ struct LighthouseApp {
     }
 }
 
-
 // MARK: - Routes
 
 func routes(_ app: Application) throws {
@@ -41,7 +40,7 @@ func routes(_ app: Application) throws {
     }
 
     // Streaming endpoint
-    app.get("stream") { req -> Response in
+    app.get("stream") { req async throws -> Response in
         var headers = HTTPHeaders()
         headers.replaceOrAdd(name: .contentType, value: "text/event-stream")
         headers.replaceOrAdd(name: .cacheControl, value: "no-cache")
@@ -49,34 +48,29 @@ func routes(_ app: Application) throws {
         headers.replaceOrAdd(name: "Access-Control-Allow-Origin", value: "*")
 
         let res = Response(status: .ok, headers: headers)
-        res.body = .init { writer in
-            var waterLevel: Double = 2.0
-            let startTime = Date()
-            func sendEvent(i: Int) {
-                guard i < 10 else {
-                    writer.write(.init(string: "data: [DONE]\n\n")).whenComplete { _ in
-                        writer.close()
-                    }
-                    return
-                }
-                let event = TideEvent(
-                    timestamp: startTime.addingTimeInterval(Double(i) * 0.2),
-                    level: waterLevel,
-                    type: waterLevel > 4.5 ? .high : .rising
-                )
-                let jsonData = try! JSONEncoder().encode(event)
-                let jsonString = String(data: jsonData, encoding: .utf8) ?? ""
-                let sseData = "data: \(jsonString)\n\n"
-                waterLevel += 0.35 + Double.random(in: 0...0.1)
-                writer.write(.init(string: sseData)).whenComplete { _ in
-                    writer.flush()
-                    usleep(200_000)  // 200ms
-                    sendEvent(i: i + 1)
-                }
-            }
-            sendEvent(i: 0)
-            return ()
+
+        // Create a simple streaming response
+        var responseBody = ""
+        var waterLevel: Double = 2.0
+        let startTime = Date()
+
+        for i in 0..<50 {
+            let event = TideEvent(
+                timestamp: startTime.addingTimeInterval(Double(i) * 0.2),
+                level: waterLevel,
+                type: waterLevel > 4.5 ? .high : .rising
+            )
+
+            let jsonData = try! JSONEncoder().encode(event)
+            let jsonString = String(data: jsonData, encoding: .utf8) ?? ""
+            responseBody += "data: \(jsonString)\n\n"
+
+            waterLevel += 0.35 + Double.random(in: 0...0.1)
         }
+
+        responseBody += "data: [DONE]\n\n"
+        res.body = .init(string: responseBody)
+
         return res
     }
 }

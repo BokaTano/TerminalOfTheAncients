@@ -66,32 +66,55 @@ struct BeaconPuzzle: Puzzle {
     // MARK: - Server Management
 
     private func ensureServerRunning() async throws {
-        print("🌊 The lighthouse beacon is already pulsing...")
+        print("🌊 Checking lighthouse beacon status...")
 
-        // Try to connect to see if server is running
-        let connection = NWConnection(
-            host: NWEndpoint.Host("localhost"), port: NWEndpoint.Port(integerLiteral: 8080),
-            using: .tcp)
-
-        connection.stateUpdateHandler = { state in
-            switch state {
-            case .ready:
-                print("✅ Server is running")
-            case .failed(let error):
-                print("❌ Server connection failed: \(error)")
-            default:
-                break
-            }
+        // First, try to connect to see if server is already running
+        if await isServerRunning() {
+            print("✅ Lighthouse server is already running")
+            return
         }
 
-        connection.start(queue: .main)
+        print("🚀 Starting lighthouse server...")
 
-        // Wait a bit for connection
-        try await Task.sleep(nanoseconds: 1_000_000_000)  // 1 second
+        // Start the lighthouse server using the script
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/bin/bash")
+        process.arguments = ["./start_lighthouse.sh"]
+        process.currentDirectoryURL = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
 
-        if connection.state == .ready {
-            connection.cancel()
+        let pipe = Pipe()
+        process.standardOutput = pipe
+        process.standardError = pipe
+
+        try process.run()
+        process.waitUntilExit()
+
+        // Wait a moment for server to start
+        try await Task.sleep(nanoseconds: 3_000_000_000)  // 3 seconds
+
+        // Check if server is now running
+        if await isServerRunning() {
+            print("✅ Lighthouse server started successfully")
+        } else {
+            throw BeaconError.serverStartFailed
         }
+    }
+
+    private func isServerRunning() async -> Bool {
+        guard let url = URL(string: "http://localhost:8080/health") else {
+            return false
+        }
+
+        do {
+            let (_, response) = try await URLSession.shared.data(from: url)
+            return (response as? HTTPURLResponse)?.statusCode == 200
+        } catch {
+            return false
+        }
+    }
+
+    enum BeaconError: Error {
+        case serverStartFailed
     }
 
     // MARK: - Data Streaming
@@ -100,42 +123,53 @@ struct BeaconPuzzle: Puzzle {
         return AsyncStream { @Sendable continuation in
             Task {
                 do {
-                    let connection = NWConnection(
-                        host: NWEndpoint.Host("localhost"),
-                        port: NWEndpoint.Port(integerLiteral: 8080), using: .tcp)
+                    // Create URL for the lighthouse server stream endpoint
+                    guard let url = URL(string: "http://localhost:8080/stream") else {
+                        print("❌ Invalid URL")
+                        continuation.finish()
+                        return
+                    }
 
-                    connection.stateUpdateHandler = { state in
-                        switch state {
-                        case .ready:
-                            print("🔗 Connecting to stream...")
-                            print("✅ Stream connected, waiting for data...")
-                        case .failed(let error):
-                            print("❌ Stream failed: \(error)")
-                            continuation.finish()
-                        default:
-                            break
+                    var request = URLRequest(url: url)
+                    request.setValue("text/event-stream", forHTTPHeaderField: "Accept")
+                    request.setValue("no-cache", forHTTPHeaderField: "Cache-Control")
+
+                    print("🔗 Connecting to lighthouse stream...")
+                    print("✅ Stream connected, waiting for data...")
+
+                    let (asyncBytes, response) = try await URLSession.shared.bytes(for: request)
+
+                    guard let httpResponse = response as? HTTPURLResponse,
+                        httpResponse.statusCode == 200
+                    else {
+                        print("❌ Server responded with error")
+                        continuation.finish()
+                        return
+                    }
+
+                    // Parse Server-Sent Events
+                    var buffer = ""
+                    for try await line in asyncBytes.lines {
+                        if line.hasPrefix("data: ") {
+                            let dataString = String(line.dropFirst(6))  // Remove "data: "
+
+                            if dataString == "[DONE]" {
+                                print("🏁 Stream finished")
+                                continuation.finish()
+                                return
+                            }
+
+                            // Parse JSON data
+                            if let data = dataString.data(using: .utf8),
+                                let event = try? JSONDecoder().decode(TideEvent.self, from: data)
+                            {
+                                continuation.yield(event)
+                            }
                         }
-                    }
-
-                    connection.start(queue: .main)
-
-                    // Wait for connection to be ready
-                    while connection.state != .ready {
-                        try await Task.sleep(nanoseconds: 100_000_000)  // 0.1 second
-                    }
-
-                    // Simulate receiving tide data
-                    for i in 0..<10 {
-                        let level = 2.0 + Double(i) * 0.4  // Simulate rising tide
-                        let event = TideEvent(timestamp: Date(), level: level, type: .rising)
-                        continuation.yield(event)
-
-                        try await Task.sleep(nanoseconds: 500_000_000)  // 0.5 second
                     }
 
                     print("🏁 Stream finished")
                     continuation.finish()
-                    connection.cancel()
 
                 } catch {
                     print("❌ Stream error: \(error)")
