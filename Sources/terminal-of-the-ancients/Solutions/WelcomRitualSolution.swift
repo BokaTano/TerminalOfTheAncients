@@ -1,0 +1,1 @@
+// start the game with the --initiate flag

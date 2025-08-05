@@ -3,20 +3,13 @@
 import Foundation
 import SwiftData
 
-// MARK: - SwiftData Models
+// MARK: Step 1: Get the glyphs from the data store
 @Model
 final class PlayerProgress {
-    var currentTaskIndex: Int
-    var completedTasks: Set<Int>
-    var lastPlayed: Date
-    var createdAt: Date
-
-    init() {
-        self.currentTaskIndex = 0
-        self.completedTasks = []
-        self.lastPlayed = Date()
-        self.createdAt = Date()
-    }
+    var currentTaskIndex: Int = 0
+    var completedTasks: Set<Int> = []
+    var lastPlayed: Date = Date()
+    var createdAt: Date = Date()
 }
 
 @Model
@@ -24,12 +17,6 @@ final class Glyph {
     var x: Int
     var y: Int
     var symbol: String
-
-    init(x: Int, y: Int, symbol: String) {
-        self.x = x
-        self.y = y
-        self.symbol = symbol
-    }
 }
 
 func getSortedGlyphs() throws -> [Glyph] {
@@ -43,10 +30,12 @@ func getSortedGlyphs() throws -> [Glyph] {
     return try context.fetch(descriptor)
 }
 
-// MARK: - Main Execution
+// MARK: Step 2: Render the glyphs
 
 // Get sorted glyphs
 let glyphs = try getSortedGlyphs()
+
+// MARK: Step 3: Create a string from the glyphs and print it 🎉
 
 // Find the grid boundaries by getting the maximum x and y coordinates
 let allXCoordinates = glyphs.map(\.x)

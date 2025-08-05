@@ -14,11 +14,14 @@ NC='\033[0m' # No Color
 
 echo -e "${BLUE}🧪 Testing Terminal of the Ancients Functionality...${NC}"
 
-# Check if we're in the right directory
-if [ ! -f "Package.swift" ]; then
-    echo -e "${RED}❌ Error: Package.swift not found. Please run this script from the TerminalOfTheAncients directory.${NC}"
+# Check if we're in the right directory (Tests folder)
+if [ ! -f "../Package.swift" ]; then
+    echo -e "${RED}❌ Error: Package.swift not found. Please run this script from the Tests directory.${NC}"
     exit 1
 fi
+
+# Change to project root directory
+cd ..
 
 # Build the project
 echo -e "${YELLOW}🔨 Building project...${NC}"

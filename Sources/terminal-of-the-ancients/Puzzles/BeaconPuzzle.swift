@@ -62,7 +62,7 @@ struct BeaconPuzzle: Puzzle {
         // Start the lighthouse server using the script
         let process = Process()
         process.executableURL = URL(fileURLWithPath: "/bin/bash")
-        process.arguments = ["./start_lighthouse.sh"]
+        process.arguments = ["./Tools/start_lighthouse.sh"]
         process.currentDirectoryURL = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
 
         let pipe = Pipe()
@@ -98,60 +98,7 @@ struct BeaconPuzzle: Puzzle {
         case serverStartFailed
     }
 
-    // MARK: - Data Streaming
-
-    private func streamTideData() -> AsyncStream<TideEvent> {
-        return AsyncStream { @Sendable continuation in
-            Task {
-                do {
-                    // Create URL for the lighthouse server stream endpoint
-                    guard let url = URL(string: "http://localhost:8080/stream") else {
-                        print("❌ Invalid URL")
-                        continuation.finish()
-                        return
-                    }
-
-                    var request = URLRequest(url: url)
-                    request.setValue("text/event-stream", forHTTPHeaderField: "Accept")
-                    request.setValue("no-cache", forHTTPHeaderField: "Cache-Control")
-
-                    let (asyncBytes, response) = try await URLSession.shared.bytes(for: request)
-
-                    guard let httpResponse = response as? HTTPURLResponse,
-                        httpResponse.statusCode == 200
-                    else {
-                        print("❌ Server responded with error")
-                        continuation.finish()
-                        return
-                    }
-
-                    // Parse Server-Sent Events
-                    for try await line in asyncBytes.lines {
-                        if line.hasPrefix("data: ") {
-                            let dataString = String(line.dropFirst(6))  // Remove "data: "
-
-                            if dataString == "[DONE]" {
-                                continuation.finish()
-                                return
-                            }
-
-                            // Parse JSON data
-                            if let data = dataString.data(using: .utf8),
-                                let event = try? JSONDecoder().decode(TideEvent.self, from: data)
-                            {
-                                continuation.yield(event)
-                            }
-                        }
-                    }
-
-                    continuation.finish()
-                } catch {
-                    print("❌ Stream error: \(error)")
-                    continuation.finish()
-                }
-            }
-        }
-    }
+    
 
     // MARK: - Display Functions
 

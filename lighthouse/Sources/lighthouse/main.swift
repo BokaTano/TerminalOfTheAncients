@@ -42,9 +42,9 @@ func routes(_ app: Application) throws {
     // Streaming endpoint
     app.get("stream") { req async throws -> Response in
         var headers = HTTPHeaders()
-        headers.replaceOrAdd(name: .contentType, value: "text/event-stream")
-        headers.replaceOrAdd(name: .cacheControl, value: "no-cache")
-        headers.replaceOrAdd(name: .connection, value: "keep-alive")
+        headers.replaceOrAdd(name: .contentType, value: "text/event-stream")  // Tells browser this is SSE streaming
+        headers.replaceOrAdd(name: .cacheControl, value: "no-cache")  // Prevents caching of streaming data
+        headers.replaceOrAdd(name: .connection, value: "keep-alive")  // Keeps connection open for streaming
         headers.replaceOrAdd(name: "Access-Control-Allow-Origin", value: "*")
 
         let res = Response(status: .ok, headers: headers)
@@ -63,12 +63,15 @@ func routes(_ app: Application) throws {
 
             let jsonData = try! JSONEncoder().encode(event)
             let jsonString = String(data: jsonData, encoding: .utf8) ?? ""
+
+            //Each streaming event must start with data and must end with \n\n (double newline)
             responseBody += "data: \(jsonString)\n\n"
 
             // More realistic tide progression: smaller increments
             waterLevel += 0.08 + Double.random(in: 0...0.05)
         }
 
+        // last stream event ends with [DONE] in our case
         responseBody += "data: [DONE]\n\n"
         res.body = .init(string: responseBody)
 

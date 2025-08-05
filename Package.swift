@@ -16,7 +16,6 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-argument-parser", from: "1.3.0"),
-
         .package(url: "https://github.com/JohnSundell/ShellOut", from: "2.3.0"),
         .package(url: "https://github.com/vapor/vapor", from: "4.0.0"),
     ],
@@ -30,6 +29,5 @@ let package = Package(
             ],
             path: "Sources/terminal-of-the-ancients"
         )
-
     ]
 )

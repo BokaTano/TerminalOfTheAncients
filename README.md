@@ -39,7 +39,7 @@ If you prefer to build manually:
 swift build
 
 # Start the lighthouse server (required for BeaconPuzzle)
-./start_lighthouse.sh
+./Tools/start_lighthouse.sh
 
 # Run the game
 .build/debug/TOTA
