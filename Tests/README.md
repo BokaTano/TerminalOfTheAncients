@@ -8,7 +8,7 @@ This folder contains all test files for the Terminal of the Ancients project.
 - **`simple_test.sh`** - Basic functionality test (build, help command)
 - **`test_game_functionality.sh`** - Tests game commands (status, reset, jump, initiate)
 - **`test_game.sh`** - Comprehensive game testing
-- **`test_shellout.sh`** - Tests ShellOut integration
+- **`test_shellout.sh`** - Tests Subprocess integration
 - **`run_all_tests.sh`** - Runs all tests and provides summary
 
 ### Swift Scripts

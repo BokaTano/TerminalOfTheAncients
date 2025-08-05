@@ -16,16 +16,16 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-argument-parser", from: "1.3.0"),
-        .package(url: "https://github.com/JohnSundell/ShellOut", from: "2.3.0"),
         .package(url: "https://github.com/vapor/vapor", from: "4.0.0"),
+        // .package(url: "https://github.com/swiftlang/swift-subprocess.git", branch: "main"),
     ],
     targets: [
         .executableTarget(
             name: "TOTA",
             dependencies: [
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
-                .product(name: "ShellOut", package: "ShellOut"),
                 .product(name: "Vapor", package: "vapor"),
+                // .product(name: "Subprocess", package: "swift-subprocess"),
             ],
             path: "Sources/terminal-of-the-ancients"
         )

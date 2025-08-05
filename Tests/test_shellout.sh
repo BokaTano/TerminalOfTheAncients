@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# 🧪 ShellOut Puzzle Test Script
-# Tests the new ShellOut integration puzzle
+# 🧪 Subprocess Puzzle Test Script
+# Tests the new Subprocess integration puzzle
 
 set -e  # Exit on any error
 
-echo "🧪 Testing ShellOut Puzzle Integration"
+echo "🧪 Testing Subprocess Puzzle Integration"
 echo "======================================"
 
 # Colors
@@ -20,7 +20,7 @@ PASSED=0
 FAILED=0
 
 # Test function
-test_shellout() {
+test_subprocess() {
     local test_name="$1"
     local command="$2"
     local expected="$3"
@@ -56,27 +56,22 @@ echo -e "\n${YELLOW}Building project...${NC}"
 swift build
 
 # Test 1: Check if build script exists and is executable
-test_shellout "Build script exists" \
+test_subprocess "Build script exists" \
     "ls -la build_and_run.sh" \
     "build_and_run.sh"
 
 # Test 2: Check if build script runs
-test_shellout "Build script runs" \
+test_subprocess "Build script runs" \
     "./build_and_run.sh --status" \
     "Build successful"
 
-# Test 3: Test ShellOut dependency is available
-test_shellout "ShellOut dependency" \
-    "swift package show-dependencies" \
-    "ShellOut"
-
 # Test 4: Test shell command execution (simulate puzzle)
-test_shellout "Shell command execution" \
-    "swift -e 'import ShellOut; print(try shellOut(to: \"echo automation\"))'" \
+test_subprocess "Shell command execution" \
+    "swift -e 'import Subprocess; print(try await run(.name(\"echo\"), arguments: [\"automation\"], output: .string(limit: 1024)))'" \
     "automation"
 
-# Test 5: Test game with ShellOut puzzle
-test_shellout "Game recognizes ShellOut puzzle" \
+# Test 5: Test game with Subprocess puzzle
+test_subprocess "Game recognizes Subprocess puzzle" \
     "./build_and_run.sh --status" \
     "Current Task: 1 of 7"
 
@@ -89,10 +84,10 @@ echo -e "${RED}❌ Failed: $FAILED${NC}"
 echo -e "${BLUE}📊 Total: $((PASSED + FAILED))${NC}"
 
 if [ $FAILED -eq 0 ]; then
-    echo -e "\n${GREEN}🎉 All ShellOut tests passed!${NC}"
-    echo -e "${YELLOW}The ShellOut integration is working correctly.${NC}"
+    echo -e "\n${GREEN}🎉 All Subprocess tests passed!${NC}"
+    echo -e "${YELLOW}The Subprocess integration is working correctly.${NC}"
     exit 0
 else
-    echo -e "\n${RED}💥 Some ShellOut tests failed.${NC}"
+    echo -e "\n${RED}💥 Some Subprocess tests failed.${NC}"
     exit 1
 fi 

@@ -1,5 +1,5 @@
 {
-  "originHash" : "92218572387391845950c5d4bb3ea7d3027e3a31fd3d722d5d821e858b3453d6",
+  "originHash" : "cffdae03aa29be6b8458b50b1316eebb7d13a749a72d00ff2374e494fc18bf94",
   "pins" : [
     {
       "identity" : "async-http-client",
@@ -44,15 +44,6 @@
       "state" : {
         "revision" : "93f7222c8e195cbad39fafb5a0e4cc85a8def7ea",
         "version" : "4.9.2"
-      }
-    },
-    {
-      "identity" : "shellout",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/JohnSundell/ShellOut",
-      "state" : {
-        "revision" : "e1577acf2b6e90086d01a6d5e2b8efdaae033568",
-        "version" : "2.3.0"
       }
     },
     {
@@ -249,8 +240,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-system.git",
       "state" : {
-        "revision" : "b63d24d465e237966c3f59f47dcac6c70fb0bca3",
-        "version" : "1.6.1"
+        "revision" : "61e4ca4b81b9e09e2ec863b00c340eb13497dac6",
+        "version" : "1.5.0"
       }
     },
     {

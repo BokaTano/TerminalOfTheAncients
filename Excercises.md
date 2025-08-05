@@ -24,8 +24,8 @@
 
 ### 5. Shell Script Ritual
 * Slides to explain the situations of having scripts from other colleages or the internet
-* Show how to incorporate a package
-* Show how to use shellout
+* Show how to incorporate Subprocess package
+* Show how to use Subprocess
 * Mark the sections for the puzzle for easy entrance
 * Install the CLI globally
 

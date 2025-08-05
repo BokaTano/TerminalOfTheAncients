@@ -49,7 +49,7 @@ extension BeaconPuzzle {
 
     // MARK: Step 1: Create an AsyncStream of TideEvents
 
-    private func streamTideData() -> AsyncStream<TideEvent> {
+    func streamTideData() -> AsyncStream<TideEvent> {
         // @Sendable is needed to make the continuation thread safe
         return AsyncStream { @Sendable continuation in
             Task {
@@ -108,7 +108,7 @@ extension BeaconPuzzle {
             return events
         }
 
-        let timeoutTask = Task {
+        _ = Task {
             try await Task.sleep(for: .seconds(60))
             streamTask.cancel()
         }

@@ -66,7 +66,7 @@ swift build
 The game features 4 unique puzzles that teach Swift programming concepts:
 
 1. **Welcome Ritual** - Learn CLI help discovery and argument parsing
-2. **The Shell Script Ritual** - Execute shell scripts with ShellOut
+2. **The Shell Script Ritual** - Execute shell scripts with Subprocess
 3. **Restore the Glyph Matrix** - SwiftData, Process execution, and ASCII reconstruction
 4. **The Voice of the Lighthouse** - Real-time streaming, async/await, and data analysis
 

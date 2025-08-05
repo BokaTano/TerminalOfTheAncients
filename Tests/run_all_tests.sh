@@ -47,7 +47,7 @@ run_test() {
 # Run all tests
 run_test "Simple Test" "simple_test.sh"
 run_test "Game Functionality Test" "test_game_functionality.sh"
-run_test "ShellOut Test" "test_shellout.sh"
+run_test "Subprocess Test" "test_shellout.sh"
 run_test "Full Game Test" "test_game.sh"
 
 # Summary
