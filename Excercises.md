@@ -17,6 +17,16 @@
 ### 3. Installation and Setup
 * Stick and Download
 * Setup Guide on Slides
+    * Download (Swift 6.2 Toolchain)[https://download.swift.org/swift-6.2-branch/xcode/swift-6.2-DEVELOPMENT-SNAPSHOT-2025-08-01-a/swift-6.2-DEVELOPMENT-SNAPSHOT-2025-08-01-a-osx.pkg] or through this
+
+    ```bash
+    swiftly install 6.2-snapshot
+    swiftly use 6.2-snapshot
+    swift --version
+    swift package clean
+    swift build
+    swift run TOTA --status
+    ```
 
 ### 4. Welcome Ritual Puzzle
 * Run the project

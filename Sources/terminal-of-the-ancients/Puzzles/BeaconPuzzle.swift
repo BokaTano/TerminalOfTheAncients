@@ -1,5 +1,6 @@
 import Foundation
 import Network
+import Subprocess
 
 struct BeaconPuzzle: Puzzle {
     let id = 3
@@ -59,20 +60,12 @@ struct BeaconPuzzle: Puzzle {
             return
         }
 
-        // Start the lighthouse server using the script
-        let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/bin/bash")
-        process.arguments = ["./Tools/start_lighthouse.sh"]
-        process.currentDirectoryURL = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
+        // Start the Lighthouse server using the provided script. We run the
+        // script with Subprocess; it will start the server in the background and
+        // then exit. The collected result provides the exit status.
+        let _ = try await run(.path("./Tools/start_lighthouse.sh"), output: .discarded)
 
-        let pipe = Pipe()
-        process.standardOutput = pipe
-        process.standardError = pipe
-
-        try process.run()
-
-        // Don't wait for the script to exit since it runs the server in background
-        // Instead, wait a moment and then check if server is running
+        // Wait a bit to give the server time to launch
         try await Task.sleep(nanoseconds: 3_000_000_000)  // 3 seconds
 
         // Check if server is now running
@@ -97,8 +90,6 @@ struct BeaconPuzzle: Puzzle {
     enum BeaconError: Error {
         case serverStartFailed
     }
-
-    
 
     // MARK: - Display Functions
 
