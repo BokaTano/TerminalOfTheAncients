@@ -18,6 +18,7 @@
 * Stick and Download
 * Setup Guide on Slides
     * Download (Swift 6.2 Toolchain)[https://download.swift.org/swift-6.2-branch/xcode/swift-6.2-DEVELOPMENT-SNAPSHOT-2025-08-01-a/swift-6.2-DEVELOPMENT-SNAPSHOT-2025-08-01-a-osx.pkg] or through this
+    * swiftly is new
 
     ```bash
     swiftly install 6.2-snapshot
@@ -27,6 +28,7 @@
     swift build
     swift run TOTA --status
     ```
+    * once you installed the 6.2 they should do something, close the laptop ie.
 
 ### 4. Welcome Ritual Puzzle
 * Run the project
@@ -60,6 +62,8 @@
         * This explicit @Sendable annotation on closures is a Swift 6.2+ feature. In earlier versions, you'd need to use @Sendable on the function itself or rely on implicit sendability
         * @Sendable = "Safe to Send" (across threads)
         * The "Thread Safety Contract"
+        
+* can I also download the docC with the project?
 Simple Explanation:
 Think of @Sendable as a promise that says "this code is safe to use across different threads."
 Real-world analogy:
@@ -77,5 +81,7 @@ It's like saying "Trust us, this is safe" without Swift's compiler checking
 
 ### 8. Finish?
 
+### Optional
+* If you make your own CLI and make it to something, you get something (ask Tim)
 
 
