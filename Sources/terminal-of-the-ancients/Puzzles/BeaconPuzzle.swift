@@ -1,6 +1,6 @@
 import Foundation
 import Network
-import Subprocess
+import ShellOut
 
 struct BeaconPuzzle: Puzzle {
     let id = 3
@@ -61,12 +61,12 @@ struct BeaconPuzzle: Puzzle {
         }
 
         // Start the Lighthouse server using the provided script. We run the
-        // script with Subprocess; it will start the server in the background and
-        // then exit. The collected result provides the exit status.
-        let _ = try await run(.path("./Tools/start_lighthouse.sh"), output: .discarded)
+        // script with ShellOut; it will start the server in the background and
+        // then exit.
+        try shellOut(to: "./Tools/start_lighthouse.sh")
 
         // Wait a bit to give the server time to launch
-        try await Task.sleep(nanoseconds: 3_000_000_000)  // 3 seconds
+        try await Task.sleep(nanoseconds: 5_000_000_000)  // 5 seconds
 
         // Check if server is now running
         if await isServerRunning() == false {

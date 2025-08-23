@@ -17,7 +17,7 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/apple/swift-argument-parser", from: "1.3.0"),
         .package(url: "https://github.com/vapor/vapor", from: "4.0.0"),
-        .package(url: "https://github.com/swiftlang/swift-subprocess.git", branch: "main"),
+        .package(url: "https://github.com/JohnSundell/ShellOut.git", from: "2.3.0"),
     ],
     targets: [
         .executableTarget(
@@ -25,7 +25,7 @@ let package = Package(
             dependencies: [
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
                 .product(name: "Vapor", package: "vapor"),
-                .product(name: "Subprocess", package: "swift-subprocess"),
+                .product(name: "ShellOut", package: "ShellOut"),
             ],
             path: "Sources/terminal-of-the-ancients",
             // Enable strict memory safety and default actor isolation. These Swift settings were

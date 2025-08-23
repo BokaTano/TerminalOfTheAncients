@@ -10,6 +10,8 @@ final class PlayerProgress {
     var completedTasks: Set<Int> = []
     var lastPlayed: Date = Date()
     var createdAt: Date = Date()
+    
+    init() {}
 }
 
 @Model
@@ -17,6 +19,12 @@ final class Glyph {
     var x: Int
     var y: Int
     var symbol: String
+    
+    init(x: Int, y: Int, symbol: String) {
+        self.x = x
+        self.y = y
+        self.symbol = symbol
+    }
 }
 
 func getSortedGlyphs() throws -> [Glyph] {

@@ -42,7 +42,7 @@ func routes(_ app: Application) throws {
     // Streaming endpoint
     app.get("stream") { req async throws -> Response in
         var headers = HTTPHeaders()
-        headers.replaceOrAdd(name: .contentType, value: "text/event-stream")  // Tells browser this is SSE streaming
+        headers.replaceOrAdd(name: .contentType, value: "text/event-stream")  // Tells this is SSE streaming
         headers.replaceOrAdd(name: .cacheControl, value: "no-cache")  // Prevents caching of streaming data
         headers.replaceOrAdd(name: .connection, value: "keep-alive")  // Keeps connection open for streaming
         headers.replaceOrAdd(name: "Access-Control-Allow-Origin", value: "*")

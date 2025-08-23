@@ -1,5 +1,5 @@
 import Foundation
-import Subprocess
+import ShellOut
 
 struct ShellScriptRitualPuzzle: Puzzle {
     let id = 1
@@ -13,10 +13,7 @@ struct ShellScriptRitualPuzzle: Puzzle {
         // Step 1: Check if the build script can be executed successfully
         do {
             print("🔨 Running build script...")
-            let result = try await run(.path("./build_and_run.sh"), output: .discarded)
-            guard result.terminationStatus == .exited(0) else {
-                return false
-            }
+            try shellOut(to: "./build_and_run.sh")
         } catch {
             return false
         }
@@ -24,9 +21,8 @@ struct ShellScriptRitualPuzzle: Puzzle {
         // Step 2: Check if the global CLI is installed
         do {
             print("🔨 Validating global CLI installation...")
-            let statusResult = try await run(
-                .name("tota"), arguments: ["--status"], output: .discarded)
-            return statusResult.terminationStatus == .exited(0)
+            try shellOut(to: "tota", arguments: ["--status"])
+            return true
         } catch {
             return false
         }

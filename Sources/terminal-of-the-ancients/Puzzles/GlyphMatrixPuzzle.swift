@@ -1,6 +1,6 @@
 import CryptoKit
 import Foundation
-import Subprocess
+import ShellOut
 import System
 
 struct GlyphMatrixPuzzle: Puzzle {
@@ -31,13 +31,9 @@ struct GlyphMatrixPuzzle: Puzzle {
     }
 
     private func validateGlyphMatrixScript(binaryPath: String) async throws -> Bool {
-        // Execute the binary using Subprocess. The script should print the
+        // Execute the binary using ShellOut. The script should print the
         // reconstructed ASCII art to standard output.
-        let result = try await run(.path(FilePath(binaryPath)), output: .string(limit: 1024 * 1024))
-        guard result.terminationStatus == .exited(0) else {
-            return false
-        }
-        let output = result.standardOutput ?? ""
+        let output = try shellOut(to: binaryPath)
 
         // Normalize line endings, strip ANSI color codes, and trim only trailing whitespace
         let normalizedOutput =

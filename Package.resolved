@@ -1,5 +1,5 @@
 {
-  "originHash" : "9e34ea8860e3b5b70a44eb8ce6484f8f91b29947d77dd3de91d16aaef26d5fc5",
+  "originHash" : "528c3e37d38d16e16ecd83d09c9dcbb26ab3a60fede5da1482a47131d01b0002",
   "pins" : [
     {
       "identity" : "async-http-client",
@@ -44,6 +44,15 @@
       "state" : {
         "revision" : "93f7222c8e195cbad39fafb5a0e4cc85a8def7ea",
         "version" : "4.9.2"
+      }
+    },
+    {
+      "identity" : "shellout",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/JohnSundell/ShellOut.git",
+      "state" : {
+        "revision" : "e1577acf2b6e90086d01a6d5e2b8efdaae033568",
+        "version" : "2.3.0"
       }
     },
     {
@@ -233,15 +242,6 @@
       "state" : {
         "revision" : "e7187309187695115033536e8fc9b2eb87fd956d",
         "version" : "2.8.0"
-      }
-    },
-    {
-      "identity" : "swift-subprocess",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/swiftlang/swift-subprocess.git",
-      "state" : {
-        "branch" : "main",
-        "revision" : "7fb7ee86df8ca4f172697bfbafa89cdc583ac016"
       }
     },
     {
