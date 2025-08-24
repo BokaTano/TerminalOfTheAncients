@@ -44,6 +44,4 @@ struct ShellScriptRitualPuzzle: Puzzle {
         print("   3. Then come back and try again")
     }
 
-    // MARK: - Swift 6.2+ Subprocess API
-    // Using Apple's official Subprocess package for modern process execution
 }

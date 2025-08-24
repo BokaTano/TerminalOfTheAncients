@@ -67,26 +67,9 @@ extension BeaconPuzzle {
 
                     // MARK: Step 4: for await loop over the asyncBytes.lines and process the data
                     // MARK: Step 5: yield the TideEvents and finish the stream correctly
-                    for try await line in asyncBytes.lines {
-                        if line.hasPrefix("data: ") {
-                            let dataString = String(line.dropFirst(6))  // Remove "data: "
-
-                            if dataString == "[DONE]" {
-                                continuation.finish()
-                                return
-                            }
-
-                            do {
-                                if let data = dataString.data(using: .utf8) {
-                                    let event = try JSONDecoder().decode(
-                                        TideEvent.self, from: data)
-                                    continuation.yield(event)
-                                }
-                            } catch {
-                                print("⚠️ Parse error: \(error)")
-                            }
-                        }
-                    }
+                    /*
+                    ... Your code here ...
+                    */
 
                     continuation.finish()
                 } catch {
@@ -108,20 +91,11 @@ extension BeaconPuzzle {
             return events
         }
 
-        _ = Task {
-            try await Task.sleep(for: .seconds(60))
-            streamTask.cancel()
-        }
+        /*
+        ... Your code here ...
+        */
 
-        // Wait for stream to finish or timeout
-        do {
-            return try await streamTask.value
-        } catch {
-            if streamTask.isCancelled {
-                throw TideStreamError.timeout
-            }
-            throw error
-        }
+        return try await streamTask.value
     }
 
     enum TideStreamError: LocalizedError {
