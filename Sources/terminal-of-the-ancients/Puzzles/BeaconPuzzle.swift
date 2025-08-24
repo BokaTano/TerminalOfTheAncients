@@ -6,9 +6,9 @@ struct BeaconPuzzle: Puzzle {
     let id = 3
     let title = "The Voice of the Lighthouse"
     let description =
-        "The lighthouse has awakened and now sends continuous tidal data through the air. The water is rising. You're standing deep in a coastal cave—and something is whispering..."
+        "The lighthouse has awakened and now sends continuous tidal data through the air. The water is rising. You're standing deep in a coastal cave—and and suddenly you feel water on your feet..."
     let hint =
-        "The beacon streams data that you must analyze. Connect to the server and extract the critical water level."
+        "The beacon streams data that you must analyze. Connect to the server and extract the critical water level. Search for MARK: Puzzle Nr. 4"
 
     func validate(input: String) async -> Bool {
         do {
@@ -117,12 +117,12 @@ struct BeaconPuzzle: Puzzle {
             ║                    🚨 EMERGENCY ALERT 🚨                      ║
             ║                                                              ║
             ║                                                              ║
-            ║  The lighthouse has revealed the truth!                     ║
-            ║  The water level is now \(String(format: "%.2f", criticalLevel)) m.                    ║
-            ║  The rising tide threatens to flood the cave.               ║
-            ║  You must evacuate immediately!                             ║
+            ║  The lighthouse has revealed the truth!                      ║
+            ║  The water level is now over \(String(format: "%.2f", criticalLevel)) m.                    ║
+            ║  The rising tide threatens to flood the cave.                ║
+            ║  You must evacuate immediately!                              ║
             ║                                                              ║
-            ║  The ancient beacon has saved your life.                    ║
+            ║  The ancient beacon has saved your life.                     ║
             ╚══════════════════════════════════════════════════════════════╝
             """
 

@@ -52,7 +52,7 @@ swift build
 - **New Game**: Run `./build/debug/TOTA`
 - **Reset Progress**: Use `--reset` flag
 - **Check Status**: Use `--status` flag
-- **Skip First Puzzle**: Use `--initiate` flag (for testing)
+- **Skip First Puzzle**: Use `--welcome` flag (for testing)
 
 ### Game Controls
 

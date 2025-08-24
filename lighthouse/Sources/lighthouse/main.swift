@@ -18,7 +18,13 @@ enum TideType: String, Codable {
 @main
 struct LighthouseApp {
     static func main() async throws {
+        // Configure environment to disable logging
+        setenv("LOG_LEVEL", "critical", 1)
+
         let app = try await Application.make()
+
+        // Configure logging to be silent
+        app.logger.logLevel = .critical
 
         // Configure CORS for local development
         app.middleware.use(CORSMiddleware())

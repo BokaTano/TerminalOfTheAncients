@@ -50,19 +50,19 @@ echo -e "${YELLOW}🔄 Testing reset command...${NC}"
 .build/debug/TOTA --reset > /dev/null 2>&1
 echo -e "${GREEN}✅ Reset command works${NC}"
 
-# Test 4: Test initiate command
-echo -e "${YELLOW}🚀 Testing initiate command...${NC}"
+# Test 4: Test welcome command
+echo -e "${YELLOW}🚀 Testing welcome command...${NC}"
 # Create a temporary input file
 temp_input=$(mktemp)
 echo "quit" > "$temp_input"
 
-output=$(.build/debug/TOTA --initiate < "$temp_input" 2>&1 || true)
+output=$(.build/debug/TOTA --welcome < "$temp_input" 2>&1 || true)
 rm "$temp_input"
 
 if echo "$output" | grep -q "Welcome Ritual completed"; then
-    echo -e "${GREEN}✅ Initiate command works${NC}"
+    echo -e "${GREEN}✅ Welcome command works${NC}"
 else
-    echo -e "${RED}❌ Initiate command failed${NC}"
+    echo -e "${RED}❌ Welcome command failed${NC}"
     echo "Output: $output"
     exit 1
 fi
@@ -97,7 +97,7 @@ test_commands=(
     ".build/debug/TOTA" \
     ".build/debug/TOTA --reset" \
     ".build/debug/TOTA --status" \
-    ".build/debug/TOTA --initiate" \
+    ".build/debug/TOTA --welcome" \
 )
 
 for cmd in "${test_commands[@]}"; do
@@ -111,10 +111,10 @@ done
 # Test 8: Test special commands
 echo -e "${YELLOW}🔍 Testing special commands...${NC}"
 special_tests=(
-    "echo 'hint' | timeout 5s .build/debug/TOTA --initiate || true" \
-    "echo 'quit' | .build/debug/TOTA --initiate" \
-    "echo 'xyzzy' | timeout 5s .build/debug/TOTA --initiate || true" \
-    "echo 'wrong' | timeout 5s .build/debug/TOTA --initiate || true" \
+    "echo 'hint' | timeout 5s .build/debug/TOTA --welcome || true" \
+    "echo 'quit' | .build/debug/TOTA --welcome" \
+    "echo 'xyzzy' | timeout 5s .build/debug/TOTA --welcome || true" \
+    "echo 'wrong' | timeout 5s .build/debug/TOTA --welcome || true" \
 )
 
 for test_cmd in "${special_tests[@]}"; do

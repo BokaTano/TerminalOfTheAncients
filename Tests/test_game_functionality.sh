@@ -77,22 +77,22 @@ else
     exit 1
 fi
 
-# Test 6: Initiate command
-echo -e "${YELLOW}🚀 Testing initiate command...${NC}"
-if .build/debug/TOTA --initiate; then
-    echo -e "${GREEN}✅ Initiate command works${NC}"
+# Test 6: Welcome command
+echo -e "${YELLOW}🚀 Testing welcome command...${NC}"
+if .build/debug/TOTA --welcome; then
+    echo -e "${GREEN}✅ Welcome command works${NC}"
 else
-    echo -e "${RED}❌ Initiate command failed${NC}"
+    echo -e "${RED}❌ Welcome command failed${NC}"
     exit 1
 fi
 
-# Test 7: Verify initiate worked
-echo -e "${YELLOW}🔍 Verifying initiate...${NC}"
+# Test 7: Verify welcome worked
+echo -e "${YELLOW}🔍 Verifying welcome...${NC}"
 STATUS_OUTPUT=$(.build/debug/TOTA --status 2>&1)
 if echo "$STATUS_OUTPUT" | grep -q "Current Task: 2"; then
-    echo -e "${GREEN}✅ Initiate verification passed${NC}"
+    echo -e "${GREEN}✅ Welcome verification passed${NC}"
 else
-    echo -e "${RED}❌ Initiate verification failed${NC}"
+    echo -e "${RED}❌ Welcome verification failed${NC}"
     echo "Status output: $STATUS_OUTPUT"
     exit 1
 fi

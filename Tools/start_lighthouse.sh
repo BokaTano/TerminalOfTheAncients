@@ -47,7 +47,7 @@ done
 
 # Start the server in the background
 echo -e "${BLUE}🚀 Starting lighthouse server on port 8080...${NC}"
-.build/debug/lighthouse &
+.build/debug/lighthouse > /dev/null 2>&1 &
 LIGHTHOUSE_PID=$!
 
 # Wait a moment for server to start

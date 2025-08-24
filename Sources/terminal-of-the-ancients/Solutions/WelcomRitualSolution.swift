@@ -1,1 +1,1 @@
-// start the game with the --initiate flag
+// start the game with the --welcome flag

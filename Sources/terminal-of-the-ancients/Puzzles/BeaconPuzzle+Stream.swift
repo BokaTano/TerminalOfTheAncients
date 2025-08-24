@@ -55,7 +55,9 @@ extension BeaconPuzzle {
             Task {
                 // MARK: Step 2: Use URLSession.shared.bytes(for:) to get our lighthouse stream data
                 do {
-                    let (asyncBytes, response) = try await URLSession.shared.bytes(
+                    // let (asyncBytes, response) = try await URLSession.shared.bytes(
+                    //     for: streamRequest)
+                    let (_, response) = try await URLSession.shared.bytes(
                         for: streamRequest)
 
                     // MARK: Step 3: Check if the response is 200 OK

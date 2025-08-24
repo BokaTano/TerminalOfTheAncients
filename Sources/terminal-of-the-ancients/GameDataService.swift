@@ -59,14 +59,19 @@ class GameDataService {
         try modelContext.save()
     }
 
-    func advanceToNextPuzzle() async throws {
+    func advanceToNextPuzzle(nextPuzzleIndex: Int? = nil) async throws {
         let progress = try await loadOrCreateProgress()
-        
+
+        if let nextPuzzleIndex = nextPuzzleIndex {
+            progress.currentTaskIndex = nextPuzzleIndex
+        } else {
+            progress.currentTaskIndex += 1
+        }
+
         // Complete current puzzle and advance to next
         progress.completedTasks.insert(progress.currentTaskIndex)
-        progress.currentTaskIndex += 1
         progress.lastPlayed = Date()
-        
+
         try await saveProgress(progress)
     }
 

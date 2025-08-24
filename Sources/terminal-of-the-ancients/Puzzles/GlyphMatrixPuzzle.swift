@@ -7,22 +7,15 @@ struct GlyphMatrixPuzzle: Puzzle {
     let id = 2
     let title = "Restore the Glyph Matrix"
     let description =
-        "The lighthouse beacon has gone dark. Write a Swift script that reads glyphs from SwiftData and reconstructs the ASCII art."
+        "The ancients gave you rights to an old database. Write a Swift script that reads their glyphs and reconstructs the ancient ASCII art. "
     let hint =
-        "Use the provided render_glyphs.swift tool. Run it with: ./Tools/run_render_glyphs.sh"
+        "Use the provided render_glyphs.swift from tools folder. Run it with: ./Tools/run_render_glyphs.sh and search for MARK: Puzzle Nr. 3"
 
     func validate(input: String) async -> Bool {
-        // Validate the binary path
-        let fileManager = FileManager.default
-        guard fileManager.fileExists(atPath: input) else {
-            print("❌ Binary not found at path: \(input)")
-            print("💡 Make sure the path is correct and the file exists.")
-            return false
-        }
 
         // Try to run the script
         do {
-            return try await validateGlyphMatrixScript(binaryPath: input)
+            return try await validateGlyphMatrixScript()
         } catch {
             print("❌ Failed to run script: \(error)")
             print("💡 Make sure the script is compiled and executable.")
@@ -30,10 +23,10 @@ struct GlyphMatrixPuzzle: Puzzle {
         }
     }
 
-    private func validateGlyphMatrixScript(binaryPath: String) async throws -> Bool {
+    private func validateGlyphMatrixScript() async throws -> Bool {
         // Execute the binary using ShellOut. The script should print the
         // reconstructed ASCII art to standard output.
-        let output = try shellOut(to: binaryPath)
+        let output = try shellOut(to: "./Tools/run_render_glyphs.sh")
 
         // Normalize line endings, strip ANSI color codes, and trim only trailing whitespace
         let normalizedOutput =
@@ -72,7 +65,7 @@ struct GlyphMatrixPuzzle: Puzzle {
     }
 
     func displayError() async {
-        print("❌ The glyph matrix remains fragmented. The lighthouse beacon stays dark.")
+        print("❌ The glyph matrix remains fragmented. The ancient ASCII art is not recognizable.")
         print("💡 Try again or type 'hint' for guidance.")
     }
 }

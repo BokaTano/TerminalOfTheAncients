@@ -5,18 +5,21 @@ struct ShellScriptRitualPuzzle: Puzzle {
     let id = 1
     let title = "The Shell Script Ritual"
     let description =
-        "The ancient terminal displays a message:\n> \"The ancients automated their workflows with shell scripts.\n> Execute the sacred build script to prove your mastery.\"\n\nFirst, run the build_and_run.sh script to prove you can execute shell scripts. Then, in a separate terminal, build a release version and install the CLI globally to complete the automation ritual."
+        "The ancient terminal displays a message:\n> \"The ancients automated their workflows with shell scripts.\n> Execute the sacred build script to prove your mastery.\"\n\nFirst, run the build_and_run.sh script to prove you can execute shell scripts. Find the ✨Mark✨ to run it inside the game.Then, in a separate terminal, build a release version and install the CLI globally to complete the automation ritual."
     let hint =
-        "First run './build_and_run.sh' to test shell script execution. Then in another terminal: 'swift build -c release' and 'sudo cp .build/release/TOTA /usr/local/bin/tota'"
+        "First run './build_and_run.sh' to test shell script execution. Search for MARK: Puzzle Nr.2 and run the script with ShellOut. Then in another terminal: 'swift build -c release' and 'sudo cp .build/release/TOTA /usr/local/bin/tota'"
 
     func validate(input: String) async -> Bool {
-        // Step 1: Check if the build script can be executed successfully
-        do {
-            print("🔨 Running build script...")
-            try shellOut(to: "./build_and_run.sh")
-        } catch {
-            return false
-        }
+        // MARK: Puzzle Nr. 2: Check if the build script can be executed successfully with ShellOut
+
+        print("🔨 Running build script...")
+        /*
+            do {
+            ... Your code here ...
+            } catch {
+                return false
+            }
+        */
 
         // Step 2: Check if the global CLI is installed
         do {

@@ -30,6 +30,7 @@ swift build 2>&1 | while IFS= read -r line; do
         printf "\r\033[K"  # Clear the progress bar line
         printf "\033[1A\033[K"  # Move up one line and clear "🔨 Building..."
         echo -e "${GREEN}✅ $line${NC}"
+        echo
     elif [[ $line =~ "error:" ]]; then
         printf "\n"
         echo -e "${RED}❌ $line${NC}"
@@ -37,8 +38,10 @@ swift build 2>&1 | while IFS= read -r line; do
 done
 
 # Run with arguments
+echo
 if [ $# -eq 0 ]; then
     .build/debug/TOTA
 else
     .build/debug/TOTA "$@"
-fi 
+fi
+ 

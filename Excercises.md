@@ -32,7 +32,7 @@
 
 ### 4. Welcome Ritual Puzzle
 * Run the project
-* Solve that you have to start it with the --initiate flag
+* Solve that you have to start it with the --welcome flag
 
 ### 5. Shell Script Ritual
 * Slides to explain the situations of having scripts from other colleages or the internet

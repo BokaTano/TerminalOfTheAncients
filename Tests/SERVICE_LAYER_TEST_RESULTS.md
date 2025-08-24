@@ -18,7 +18,7 @@
 - ✅ **Reset command** (`--reset`) executes without errors
 - ✅ **Jump command** (`--jump`) accepts parameters
 - ✅ **Status command** (`--status`) available
-- ✅ **Initiate command** (`--initiate`) available
+- ✅ **Welcome command** (`--welcome`) available
 
 ### 3. Service Layer Architecture
 - ✅ **GameDataService** successfully created
@@ -61,8 +61,8 @@ swift build
 # Test status functionality
 .build/debug/terminal-of-the-ancients --status
 
-# Test initiate functionality
-.build/debug/terminal-of-the-ancients --initiate
+# Test welcome functionality
+.build/debug/terminal-of-the-ancients --welcome
 ```
 
 ## 📊 Code Quality Improvements

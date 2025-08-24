@@ -9,8 +9,8 @@ struct TerminalOfTheAncients: AsyncParsableCommand {
         version: "1.0.0"
     )
 
-    @Flag(name: .long, help: "Initialize the game and begin your journey")
-    var initiate = false
+    @Flag(name: .long, help: "Welcome to the game, use me and go to the next puzzle")
+    var welcome = false
 
     @Flag(name: .long, help: "Reset the game and start over")
     var reset = false
@@ -40,14 +40,15 @@ struct TerminalOfTheAncients: AsyncParsableCommand {
             return
         }
 
-        // Handle --initiate flag (skip to puzzle 1)
-        if initiate {
-            try await dataService.advanceToNextPuzzle()
+        // Handle --welcome flag (skip to puzzle 1)
+        if welcome {
+            try await dataService.advanceToNextPuzzle(nextPuzzleIndex: 1)
 
             let welcomePuzzle = WelcomeRitualPuzzle()
             await welcomePuzzle.displaySuccess()
-
-            return
+            print()
+            print("--------------------------------")
+            print()
         }
 
         // Start the interactive game
@@ -64,6 +65,8 @@ struct TerminalOfTheAncients: AsyncParsableCommand {
 
             // Show task info for all puzzles
             print("📍 Current Location: Task \(progress.currentTaskIndex + 1) of \(tasks.count)")
+            print()
+            print("--------------------------------")
             print()
 
             let completed = await playPuzzle(
@@ -99,7 +102,10 @@ struct TerminalOfTheAncients: AsyncParsableCommand {
         }
 
         while true {
-            print("💭 Enter your answer (or 'hint' for help, 'quit' to exit):")
+            print()
+            print(
+                "💭 Enter your answer (or 'hint' for help, 'quit' to exit, or 'enter' in case you think you got it):"
+            )
             guard let input = readLine()?.trimmingCharacters(in: .whitespacesAndNewlines) else {
                 print("❌ No input available. Exiting...")
                 return false

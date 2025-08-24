@@ -9,7 +9,7 @@ struct WelcomeRitualPuzzle: Puzzle {
         "The ancient ones used flags to control their programs. Try to quit the CLI and use the help flag to discover available options."
 
     func validate(input: String) async -> Bool {
-        // This is handled by the main program logic for --initiate flag
+        // This is handled by the main program logic for --welcome flag
         return false
     }
 
