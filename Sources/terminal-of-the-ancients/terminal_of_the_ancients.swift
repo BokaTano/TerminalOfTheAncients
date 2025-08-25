@@ -6,7 +6,10 @@ struct TerminalOfTheAncients: AsyncParsableCommand {
     static let configuration = CommandConfiguration(
         commandName: "tota",
         abstract: "Terminal of the Ancients - An interactive CLI adventure game",
-        version: "1.0.0"
+        version: "1.0.0",
+        subcommands: [
+            ClaimCommand.self
+        ]
     )
 
     @Flag(name: .long, help: "Welcome to the game, use me and go to the next puzzle")
