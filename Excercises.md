@@ -56,26 +56,16 @@
 * To fully leverage it, I want to use streaming. Our lighthouse is sending us data. But not just thousands of pages of data in one request or nicely paginated. No! It streams us data chunks and we will never know when it is finished. 
     * show the `main.swift` inside the lighthouse
           ```headers.replaceOrAdd(name: .contentType, value: "text/event-stream")```
+    
     * show the ``` try await URLSession.shared.bytes(for: streamRequest)``` bytes method in slide, it's the magic methods that receives the stream data
         * The .lines property on AsyncBytes was introduced in Swift 6.2. In Swift 6.1, you'd need to manually iterate over bytes and split by newlines
+    
     * @Sendable
         * This explicit @Sendable annotation on closures is a Swift 6.2+ feature. In earlier versions, you'd need to use @Sendable on the function itself or rely on implicit sendability
         * @Sendable = "Safe to Send" (across threads)
         * The "Thread Safety Contract"
         
 * can I also download the docC with the project?
-Simple Explanation:
-Think of @Sendable as a promise that says "this code is safe to use across different threads."
-Real-world analogy:
-Imagine you have a toy that multiple kids want to play with
-@Sendable is like putting a label on the toy that says "This toy is safe for all kids to share"
-Without this label, Swift won't let you pass the toy between kids (threads) because it might break
-This says: "I promise this closure is safe to run on any thread, so you can use it in async contexts."
-        * The @unchecked Sendable Reality:
-What it means:
-@unchecked Sendable = "We promise this is thread-safe, but Swift can't verify it automatically"
-It's like saying "Trust us, this is safe" without Swift's compiler checking
-        * Explanation of the AsyncStream 
 * Optional Task is Timeout functionality
 * Check if processing has worked
 
