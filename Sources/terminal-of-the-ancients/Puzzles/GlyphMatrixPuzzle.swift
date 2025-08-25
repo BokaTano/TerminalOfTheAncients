@@ -61,7 +61,9 @@ struct GlyphMatrixPuzzle: Puzzle {
     }
 
     func displaySuccess() async {
-        print("✅ Glyph Matrix restored! The ancient lighthouse emerges from the digital depths.")
+        print(
+            "✅ Glyph Matrix restored! The ancient lighthouse emerges from the digital depths. \n\nBut suddenly the floor beneath you vanishes and you slide into a dark cold room. \n\nA new terminal appears in front of you... "
+        )
     }
 
     func displayError() async {
