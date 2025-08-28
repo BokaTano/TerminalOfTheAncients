@@ -20,15 +20,7 @@ struct ShellScriptRitualPuzzle: Puzzle {
                 return false
             }
         */
-
-        // Step 2: Check if the global CLI is installed
-        do {
-            print("🔨 Validating global CLI installation...")
-            try shellOut(to: "tota", arguments: ["--status"])
-            return true
-        } catch {
-            return false
-        }
+        return false
     }
 
     func displaySuccess() async {

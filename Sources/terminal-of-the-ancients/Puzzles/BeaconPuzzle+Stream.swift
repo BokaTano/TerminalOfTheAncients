@@ -47,44 +47,29 @@ extension BeaconPuzzle {
 
     // Create an AsyncStream of TideEvents
 
-    private func streamTideData() -> AsyncStream<TideEvent> {
-        // @Sendable is needed to make the continuation thread safe
+    func streamTideData() -> AsyncStream<TideEvent> {
         return AsyncStream { @Sendable continuation in
             Task {
-                // MARK: Step 2: Use URLSession.shared.bytes(for:) to get our lighthouse stream data
                 do {
-                    let (asyncBytes, response) = try await URLSession.shared.bytes(
+                    // let (asyncBytes, response) = try await URLSession.shared.bytes(
+                    //     for: streamRequest)
+                    let (_, response) = try await URLSession.shared.bytes(
                         for: streamRequest)
 
-                    // MARK: Step 3: Check if the response is 200 OK
+                    // Check if the response is 200 OK
                     guard let httpResponse = response as? HTTPURLResponse,
                         httpResponse.statusCode == 200
                     else {
                         throw TideStreamError.serverError
                     }
 
-                    // MARK: Step 4: for await loop over the asyncBytes.lines and process the data
-                    // MARK: Step 5: yield the TideEvents and finish the stream correctly
-                    for try await line in asyncBytes.lines {
-                        if line.hasPrefix("data: ") {
-                            let dataString = String(line.dropFirst(6))  // Remove "data: "
+                    // Puzzle Nr. 4: Beacon Puzzle 𐦊
 
-                            if dataString == "[DONE]" {
-                                continuation.finish()
-                                return
-                            }
-
-                            do {
-                                if let data = dataString.data(using: .utf8) {
-                                    let event = try JSONDecoder().decode(
-                                        TideEvent.self, from: data)
-                                    continuation.yield(event)
-                                }
-                            } catch {
-                                print("⚠️ Parse error: \(error)")
-                            }
-                        }
-                    }
+                    // Step 1: for await loop over the asyncBytes.lines and process the data
+                    // Step 2: yield the TideEvents and finish the stream correctly
+                    /*
+                    ... Your code here ...
+                    */
 
                     continuation.finish()
                 } catch {
