@@ -28,6 +28,14 @@ let package = Package(
                 .product(name: "ShellOut", package: "ShellOut"),
             ],
             path: "Sources/terminal-of-the-ancients",
+            exclude: [
+                ".DS_Store",
+                "*.pkg",
+                "render_glyphs",
+                "*.md",
+                "*.sh",
+                "*.code-workspace",
+            ],
             // Enable strict memory safety and default actor isolation. These Swift settings were
             // introduced in tools‑version 6.2 and help catch unsafe pointer usage and data races.
             swiftSettings: [

@@ -47,7 +47,7 @@ extension BeaconPuzzle {
 
     // Create an AsyncStream of TideEvents
 
-    func streamTideData() -> AsyncStream<TideEvent> {
+    func streamTideData() async throws -> AsyncStream<TideEvent> {
         return AsyncStream { @Sendable continuation in
             Task {
                 do {
@@ -71,9 +71,9 @@ extension BeaconPuzzle {
                     ... Your code here ...
                     */
 
-                    continuation.finish()
-                } catch {
-                    print("❌ Stream error: \(error)")
+                    // Placeholder that will always throw - attendee must replace this
+                    throw TideStreamError.incompleteImplementation
+
                     continuation.finish()
                 }
             }
@@ -82,26 +82,36 @@ extension BeaconPuzzle {
 
     // MARK: - Public API with timeout
     // MARK: Step 6(Optional): timeout the Task if it takes longer than 60 seconds
-    func streamTideDataWithTimeout() async throws -> [TideEvent] {
-        let streamTask = Task {
-            var events: [TideEvent] = []
-            for try await event in streamTideData() {
-                events.append(event)
-            }
-            return events
+    func streamTideDataWithTimeout() async throws -> AsyncStream<TideEvent> {
+        // Create a timeout task that throws TideStreamError.timeout after 60 seconds
+        let timeoutTask = Task {
+            try await Task.sleep(nanoseconds: 10_000_000_000)  // 60 seconds
+            throw TideStreamError.timeout
         }
 
-        /*
-        ... Your code here ...
-        */
+        // Race between stream completion and timeout
+        return try await withTaskCancellationHandler {
+            try await withThrowingTaskGroup(of: AsyncStream<TideEvent>.self) { group in
+                group.addTask { try await streamTideData() }
+                group.addTask {
+                    try await timeoutTask.value
+                    throw TideStreamError.timeout
+                }
 
-        return try await streamTask.value
+                let stream = try await group.next()!
+                group.cancelAll()
+                return stream
+            }
+        } onCancel: {
+            timeoutTask.cancel()
+        }
     }
 
     enum TideStreamError: LocalizedError {
         case serverError
         case invalidData
         case timeout
+        case incompleteImplementation
 
         var errorDescription: String? {
             switch self {
@@ -111,6 +121,8 @@ extension BeaconPuzzle {
                 return "Invalid data received from stream"
             case .timeout:
                 return "Stream connection timed out"
+            case .incompleteImplementation:
+                return "Incomplete implementation"
             }
         }
     }

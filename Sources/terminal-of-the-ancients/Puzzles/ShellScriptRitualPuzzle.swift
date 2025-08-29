@@ -16,6 +16,7 @@ struct ShellScriptRitualPuzzle: Puzzle {
         /*
             do {
             ... Your code here ...
+                return true
             } catch {
                 return false
             }

@@ -36,20 +36,43 @@ struct BeaconPuzzle: Puzzle {
         print()
 
         // Start streaming with visualization
-        let stream = streamTideData()
+        do {
+            let stream = try await streamTideDataWithTimeout()
 
-        for try await event: TideEvent in stream {
-            // Display water level with progress bar
-            displayWaterLevel(event.level)
+            // Validation: Ensure we got meaningful data
+            var eventCount = 0
+            for try await event in stream {
+                eventCount += 1
+                // Display water level with progress bar
+                displayWaterLevel(event.level)
 
-            // Add minimal pacing for the animation
-            try await Task.sleep(nanoseconds: 20_000_000)  // 0.02 second
+                // Add minimal pacing for the animation
+                try await Task.sleep(nanoseconds: 20_000_000)  // 0.02 second
+            }
+
+            // Check if we received any events
+            if eventCount == 0 {
+                throw BeaconError.noDataReceived
+            }
+
+            print()
+            print("🔍 Analyzing tidal data...")
+            print()
+            try await Task.sleep(nanoseconds: 1_000_000_000)  // 1 second
+        } catch let error as TideStreamError {
+            switch error {
+            case .incompleteImplementation:
+                throw BeaconError.incompleteImplementation(
+                    "You need to implement the streaming logic! Look for the comments in the code."
+                )
+            case .timeout:
+                throw BeaconError.timeout
+            case .serverError:
+                throw BeaconError.serverError
+            case .invalidData:
+                throw BeaconError.invalidData
+            }
         }
-
-        print()
-        print("🔍 Analyzing tidal data...")
-        print()
-        try await Task.sleep(nanoseconds: 1_000_000_000)  // 1 second
     }
 
     // MARK: - Server Management
@@ -87,8 +110,30 @@ struct BeaconPuzzle: Puzzle {
         }
     }
 
-    enum BeaconError: Error {
+    enum BeaconError: LocalizedError {
         case serverStartFailed
+        case noDataReceived
+        case incompleteImplementation(String)
+        case timeout
+        case serverError
+        case invalidData
+
+        var errorDescription: String? {
+            switch self {
+            case .serverStartFailed:
+                return "Failed to start the lighthouse server"
+            case .noDataReceived:
+                return "No tidal data was received from the beacon"
+            case .incompleteImplementation(let message):
+                return message
+            case .timeout:
+                return "Connection to the beacon timed out"
+            case .serverError:
+                return "The lighthouse server responded with an error"
+            case .invalidData:
+                return "Invalid data received from the beacon"
+            }
+        }
     }
 
     // MARK: - Display Functions
