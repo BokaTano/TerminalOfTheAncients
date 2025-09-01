@@ -30,21 +30,6 @@ cd TerminalOfTheAncients
 
 The game will automatically start the required lighthouse server for the BeaconPuzzle.
 
-### Alternative: Manual Setup
-
-If you prefer to build manually:
-
-```bash
-# Build the project
-swift build
-
-# Start the lighthouse server (required for BeaconPuzzle)
-./Tools/start_lighthouse.sh
-
-# Run the game
-.build/debug/TOTA
-```
-
 ## 🎯 How to Play
 
 ### Starting the Game
@@ -110,29 +95,6 @@ swift test
 # Run the game
 .build/debug/TOTA
 ```
-
-## 🎨 Features
-
-- **Interactive CLI Interface** with colorful ASCII art
-- **Progress Persistence** using SwiftData
-- **Animated Visual Effects** for puzzle completion
-- **Hint System** to help players when stuck
-- **Easter Eggs** for curious explorers
-- **Modular Architecture** for easy puzzle addition
-
-## 📝 License
-
-This project is open source and available under the [MIT License](LICENSE).
-
-## 🤝 Contributing
-
-Contributions are welcome! Feel free to:
-
-- Add new puzzles
-- Improve ASCII art
-- Enhance the game mechanics
-- Fix bugs
-- Add new features
 
 ## 🎉 Acknowledgments
 
