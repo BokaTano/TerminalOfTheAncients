@@ -15,10 +15,6 @@ struct BeaconPuzzle: Puzzle {
             try await runPuzzle()
             return true
         } catch {
-            print("❌ Beacon analysis failed: \(error)")
-            print(
-                "💡 The lighthouse server may not be running. Try again or type 'hint' for guidance."
-            )
             return false
         }
     }
@@ -32,7 +28,7 @@ struct BeaconPuzzle: Puzzle {
     @MainActor
     private func runPuzzle() async throws {
         print()
-        print("💬 The beacon pulses...")
+        print("💬 The beacon pulses... Wait a few seconds for the data to start flowing...")
         print()
 
         // Start streaming with visualization
@@ -62,9 +58,7 @@ struct BeaconPuzzle: Puzzle {
         } catch let error as TideStreamError {
             switch error {
             case .incompleteImplementation:
-                throw BeaconError.incompleteImplementation(
-                    "You need to implement the streaming logic! Look for the comments in the code."
-                )
+                throw BeaconError.incompleteImplementation
             case .timeout:
                 throw BeaconError.timeout
             case .serverError:
@@ -72,6 +66,8 @@ struct BeaconPuzzle: Puzzle {
             case .invalidData:
                 throw BeaconError.invalidData
             }
+        } catch {
+            throw error
         }
     }
 
@@ -113,7 +109,7 @@ struct BeaconPuzzle: Puzzle {
     enum BeaconError: LocalizedError {
         case serverStartFailed
         case noDataReceived
-        case incompleteImplementation(String)
+        case incompleteImplementation
         case timeout
         case serverError
         case invalidData
@@ -124,8 +120,9 @@ struct BeaconPuzzle: Puzzle {
                 return "Failed to start the lighthouse server"
             case .noDataReceived:
                 return "No tidal data was received from the beacon"
-            case .incompleteImplementation(let message):
-                return message
+            case .incompleteImplementation:
+                return
+                    "You need to implement the streaming logic! Look for the comments in the code."
             case .timeout:
                 return "Connection to the beacon timed out"
             case .serverError:
